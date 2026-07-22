@@ -1,6 +1,9 @@
 /**
- * Correcteur typographique pour la langue française v8.0
- * Avec système de fallback automatique vers U+00A0 si U+202F n'est pas supporté par le système.
+ * Correcteur typographique pour la langue française v10.0
+ * Conforme aux normes de l'Imprimerie nationale (FR) et de l'OQLF (CA).
+ * 
+ * Traite les nœuds de texte un par un pour préserver l'intégrité des balises.
+ * Intègre un MutationObserver et un test de rendu par Canvas pour le fallback.
  */
 (function() {
   const BALISES_A_EXCLURE = ['CODE', 'PRE', 'SCRIPT', 'STYLE', 'INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'OPTION'];
@@ -8,37 +11,45 @@
   let observateurDynamique = null;
 
   /**
-   * RECONNAISSANCE DU SYSTEME (TEST DE RENDU)
-   * Crée un canvas invisible pour vérifier si le système sait dessiner le caractère U+202F.
-   * Si le caractère est rendu comme un rectangle vide (identique à un caractère inexistant U+FFFF),
-   * le script active le fallback automatique vers l'espace insécable classique (\u00A0).
+   * TEST DE RENDU PAR CANVAS
+   * Vérifie si le système sait dessiner le caractère U+202F.
+   * Si la largeur est identique à un caractère inexistant (U+FFFF) ou nulle,
+   * active le fallback automatique vers l'espace insécable classique (\u00A0).
    */
   function verifierSupportEspaceFine() {
     try {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      if (!ctx) return '\u00A0'; // Sécurité : si canvas non supporté, fallback direct
+      if (!ctx) return '\u00A0';
 
       ctx.font = '16px sans-serif';
-      
-      // Mesure la largeur d'un caractère invalide (U+FFFF) générant le glyphe de remplacement par défaut ▯
       const largeurInvalide = ctx.measureText('\uFFFF').width;
-      // Mesure la largeur de l'espace fine insécable
       const largeurFine = ctx.measureText('\u202F').width;
 
-      // Si les largeurs sont identiques ou si la largeur est nulle, le système ne gère pas proprement le caractère
       if (largeurFine === largeurInvalide || largeurFine === 0) {
-        return '\u00A0'; // Bascule sur l'espace insécable normale
+        return '\u00A0';
       }
-      return '\u202F'; // Le système supporte l'espace fine insécable
+      return '\u202F';
     } catch (e) {
-      return '\u00A0'; // Fallback de sécurité en cas d'erreur
+      return '\u00A0';
     }
   }
 
-  // Assignation dynamique de l'espace haut selon le résultat du test de support
-  const ESPACE_HAUTE = verifierSupportEspaceFine();
+  const ESPACE_FINE = verifierSupportEspaceFine();
 
+  // Liste des unités ISO et Impériales à lier au nombre qui les précède
+  const REGEX_UNITES = new RegExp(
+    '(?<=\\d)\\s*(' +
+    '°[CF]|' + // Températures
+    '(?:[kMGmcd])?(?:m|g|l|L|Wh|Hz|W|V|A|N|Pa|B)|t|hPa|dB|' + // ISO et préfixes
+    '(?:m|cm|mm)[²³]|' + // Surfaces et volumes
+    'in|ft|yd|mi|oz|lb|gal|qt|pt|mph' + // Impériales
+    ')(?=\\s|\\b|\\p{P}|$)', 'gu'
+  );
+
+  /**
+   * Analyse récursive du DOM et application des règles
+   */
   function corrigerTypographieFrancaise(element) {
     if (!element || element.nodeType !== Node.ELEMENT_NODE) return;
     if (BALISES_A_EXCLURE.includes(element.tagName)) return;
@@ -46,19 +57,17 @@
 
     const codeLangue = element.getAttribute('lang');
     if (codeLangue && !codeLangue.startsWith('fr')) return;
+    if (!element.closest('[lang^="fr"]')) return;
 
-    const estEnFrancais = element.closest('[lang^="fr"]') !== null;
-    if (!estEnFrancais) return;
-
-    // Traitement spécifique de la balise <time>
+    // --- TRAITEMENT BALISE <time> ---
     if (element.tagName === 'TIME') {
       element.childNodes.forEach(noeud => {
         if (noeud.nodeType === Node.TEXT_NODE) {
           let texte = noeud.textContent;
-          texte = texte.replace(/(?<=\d)\s*(h|min|s)(?=\s|\d|$)/gi, `${ESPACE_HAUTE}$1`);
-          texte = texte.replace(/(?<=(h|min))\s*(?=\d)/gi, ESPACE_HAUTE);
-          texte = texte.replace(/(?<=^|\s)(\d{1,2})\s+([a-zéû]+)\s+(\d{4})(?=$|\s)/gi, `$1${ESPACE_HAUTE}$2${ESPACE_HAUTE}$3`);
-          texte = texte.replace(/(?<=^|\s)(1er)\s+([a-zéû]+)\s+(\d{4})(?=$|\s)/gi, `$1${ESPACE_HAUTE}$2${ESPACE_HAUTE}$3`);
+          texte = texte.replace(/(?<=\d)\s*(h|min|s)(?=\s|\d|$)/gi, `${ESPACE_FINE}$1`);
+          texte = texte.replace(/(?<=(h|min))\s*(?=\d)/gi, ESPACE_FINE);
+          texte = texte.replace(/(?<=^|\s)(\d{1,2})\s+([a-zéû]+)\s+(\d{4})(?=$|\s)/gi, `$1${ESPACE_FINE}$2${ESPACE_FINE}$3`);
+          texte = texte.replace(/(?<=^|\s)(1er)\s+([a-zéû]+)\s+(\d{4})(?=$|\s)/gi, `$1${ESPACE_FINE}$2${ESPACE_FINE}$3`);
           noeud.textContent = texte;
         }
       });
@@ -67,39 +76,42 @@
 
     const estDansUnTableau = element.closest('table') !== null;
 
+    // --- TRAITEMENT DES NŒUDS DE TEXTE ---
     element.childNodes.forEach(noeud => {
       if (noeud.nodeType === Node.TEXT_NODE) {
         let texte = noeud.textContent;
 
-        // --- RÈGLE 1 : Apostrophes courbes
+        // RÈGLE 1 : Apostrophes courbes entre deux lettres
         texte = texte.replace(/(?<=\p{L})[''](?=\p{L})/gu, '’'); 
         
-        // --- RÈGLE 2 : Ponctuation double
-        texte = texte.replace(/\s*(:)/g, '\u00A0$1'); // Deux-points toujours en espace insécable normale
-        texte = texte.replace(/\s*([;!?])/g, `${ESPACE_HAUTE}$1`); // Utilise la variable adaptative
+        // RÈGLE 2 : Ponctuation double (; : ! ?)
+        texte = texte.replace(/\s*(:)/g, '\u00A0$1'); // Deux-points (\u00A0)
+        texte = texte.replace(/\s*([;!?])/g, `${ESPACE_FINE}$1`); // Autres (ESPACE_FINE)
         
-        // --- RÈGLE 3 : Guillemets français
-        texte = text.replace(/(^|[\s(])"\s*([^"\s][^"]*?)\s*"/g, `$1«${ESPACE_HAUTE}$2${ESPACE_HAUTE}»`);
-        texte = texte.replace(/«\s*/g, `«${ESPACE_HAUTE}`);
-        texte = texte.replace(/\s*»/g, `${ESPACE_HAUTE}»`);
+        // RÈGLE 3 : Guillemets français (« »)
+        texte = texte.replace(/(^|[\s(])"\s*([^"\s][^"]*?)\s*"/g, `$1«${ESPACE_FINE}$2${ESPACE_FINE}»`);
+        texte = texte.replace(/«\s*/g, `«${ESPACE_FINE}`);
+        texte = texte.replace(/\s*»/g, `${ESPACE_FINE}»`);
 
-        // --- RÈGLE 4 : Devises et Pourcentages
-        texte = texte.replace(/(?<=\d)\s*([$€£¥₣₩元])/g, `${ESPACE_HAUTE}$1`);
-        texte = texte.replace(/(?<=\d)\s*([%‰₱])/g, `${ESPACE_HAUTE}$1`);
+        // RÈGLE 4 : Devises et Pourcentages
+        texte = texte.replace(/(?<=\d)\s*([$€£¥₣₩元])/g, `${ESPACE_FINE}$1`);
+        texte = texte.replace(/(?<=\d)\s*([%‰₱])/g, `${ESPACE_FINE}$1`);
 
-        // --- RÈGLE 5 : Tirets de dialogue et d'incise (Espace insécable normale \u00A0 exigée)
+        // RÈGLE 5 : Unités de mesure physiques
+        texte = texte.replace(REGEX_UNITES, `${ESPACE_FINE}$1`);
+
+        // RÈGLE 6 : Tirets de dialogue (début de ligne) et d'incise (\u00A0 exigée)
         texte = texte.replace(/^(?:[-–—]\s*)/gm, '—\u00A0');
         texte = texte.replace(/\s+([-–—])\s+/g, ' –\u00A0');
 
-        // --- RÈGLE 6 : Grands nombres
+        // RÈGLE 7 : Grands nombres (Séparateur de milliers)
         texte = texte.replace(/\b\d+[\d\s]*\b/g, (nombreGlobal) => {
           let parties = nombreGlobal.split(/[,.]/);
           let partieEntiere = parties[0].replace(/\s/g, ''); 
-
           const seuilAtteint = estDansUnTableau ? (partieEntiere.length >= 4) : (partieEntiere.length >= 5);
 
           if (seuilAtteint) {
-            partieEntiere = partieEntiere.replace(/\B(?=(\d{3})+(?!\d))/g, ESPACE_HAUTE);
+            partieEntiere = partieEntiere.replace(/\B(?=(\d{3})+(?!\d))/g, ESPACE_FINE);
             parties[0] = partieEntiere;
             return parties.join(nombreGlobal.includes(',') ? ',' : '.');
           }
@@ -121,8 +133,11 @@
     mutations.forEach((mutation) => {
       if (mutation.type === 'childList') {
         mutation.addedNodes.forEach((noeud) => {
-          if (noeud.nodeType === Node.ELEMENT_NODE) corrigerTypographieFrancaise(noeud);
-          else if (noeud.nodeType === Node.TEXT_NODE && noeud.parentElement) corrigerTypographieFrancaise(noeud.parentElement);
+          if (noeud.nodeType === Node.ELEMENT_NODE) {
+            corrigerTypographieFrancaise(noeud);
+          } else if (noeud.nodeType === Node.TEXT_NODE && noeud.parentElement) {
+            corrigerTypographieFrancaise(noeud.parentElement);
+          }
         });
       } else if (mutation.type === 'characterData' && mutation.target.parentElement) {
         corrigerTypographieFrancaise(mutation.target.parentElement);
