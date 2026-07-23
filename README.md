@@ -1,6 +1,6 @@
 # correcteur-typo
 Correcteur Orthotypographique en JavaScrpt pour la langue française selon le *Lexique des règles typographiques en usage à l'Imprimerie nationale* (France) et l’OQLF (Québec)
-# Comparaison des guides typographiques majeurs (France, Québec, Suisse)
+## Comparaison des guides typographiques majeurs (France, Québec, Suisse)
 
 Ces quatre ouvrages sont les bibles de la typographie francophone : **Le nouveau code typographique**, le **Lexique des règles typographiques en usage à l'Imprimerie nationale**, **Le Ramat de la typographie** et le **Guide du typographe** (couramment appelé *Guide romand*). Bien qu'ils partagent un même objectif de rigueur et de lisibilité, ils se distinguent nettement par leur origine géographique, leur structure et leurs arbitrages techniques.
 
