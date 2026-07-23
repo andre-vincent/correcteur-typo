@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab Typographique Français — Suite de Validation</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header>
+    <h1>Laboratoire d'Essais Typographiques</h1>
+    <p>Cette page valide en temps réel l'application des normes de l'Imprimerie nationale et de l'OQLF via notre script automatique.</p>
+  </header>
+
+  <main lang="fr">
+    
+    <!-- SECTION 1 : APOSTROPHES -->
+    <section>
+      <h2>1. L'Apostrophe Courbe</h2>
+      <h3>Pourquoi ?</h3>
+      <p>L'apostrophe droite (') est un héritage des machines à écrire. En typographie française fine, l'apostrophe doit être courbe (’) pour s'harmoniser avec le dessin des lettres.</p>
+      <h3>Comment la règle opère ?</h3>
+      <p>Le script repère les apostrophes droites situées exclusivement entre deux lettres Unicode grâce à des assertions de ciblage, évitant de modifier les symboles de minutes ou de pieds.</p>
+      
+      <blockquote>
+        <strong>Exemple Brut (Avant) :</strong><br>
+        <span class="no-typo">C'est l'arbre de l'étudiant qui grandit aujourd'hui.</span>
+      </blockquote>
+      <blockquote>
+        <strong>Exemple Corrigé (Après) :</strong><br>
+        <ins>C'est l'arbre de l'étudiant qui grandit aujourd'hui.</ins>
+      </blockquote>
+    </section>
+
+    <!-- SECTION 2 : PONCTUATION DOUBLE -->
+    <section>
+      <h2>2. La Ponctuation Double</h2>
+      <h3>Pourquoi ?</h3>
+      <p>Les signes de ponctuation composés de deux éléments (; ! ?) requièrent une espace fine insécable pour éviter d'être collés au mot précédent. Le deux-points (:) exige quant à lui une espace insécable normale.</p>
+      <h3>Comment la règle opère ?</h3>
+      <p>Le script nettoie tout type d'espace existant (ou l'absence d'espace) devant ces signes, puis injecte l'espace appropriée (\u00A0 ou \u202F).</p>
+      
+      <blockquote>
+        <strong>Exemple Brut (Avant) :</strong><br>
+        <span class="no-typo">Incroyable! Est-ce vrai? Regardez ceci: un point-virgule; c'est tout.</span>
+      </blockquote>
+      <blockquote>
+        <strong>Exemple Corrigé (Après) :</strong><br>
+        <ins>Incroyable! Est-ce vrai? Regardez ceci: un point-virgule; c'est tout.</ins>
+      </blockquote>
+    </section>
+
+    <!-- SECTION 3 : GUILLEMETS -->
+    <section>
+      <h2>3. Les Guillemets Français</h2>
+      <h3>Pourquoi ?</h3>
+      <p>La langue française utilise les chevrons (« ») accompagnés d'espaces intérieures à la place des guillemets anglais (" ").</p>
+      <h3>Comment la règle opère ?</h3>
+      <p>Le script capture les paires de guillemets droits, les convertit en chevrons, et insère des espaces fines insécables de manière standardisée.</p>
+      
+      <blockquote>
+        <strong>Exemple Brut (Avant) :</strong><br>
+        <span class="no-typo">Il a dit : "Le projet est validé" au directeur.</span>
+      </blockquote>
+      <blockquote>
+        <strong>Exemple Corrigé (Après) :</strong><br>
+        <ins>Il a dit : "Le projet est validé" au directeur.</ins>
+      </blockquote>
+    </section>
+
+    <!-- SECTION 4 : DEVISES ET POURCENTAGES -->
+    <section>
+      <h2>4. Devises et Pourcentages</h2>
+      <h3>Pourquoi ?</h3>
+      <p>En français, les symboles monétaires et de pourcentage se placent après le nombre et doivent être liés à celui-ci par une espace insécable pour éviter qu'ils ne se retrouvent isolés à la ligne suivante.</p>
+      <h3>Comment la règle opère ?</h3>
+      <p>Le script recherche les chiffres suivis de $, €, %, ‰, capture les espaces irrégulières et force l'utilisation de l'espace fine insécable.</p>
+      
+      <blockquote>
+        <strong>Exemple Brut (Avant) :</strong><br>
+        <span class="no-typo">Le taux d'intérêt est de 5.5% et le prix s'élève à 1500€.</span>
+      </blockquote>
+      <blockquote>
+        <strong>Exemple Corrigé (Après) :</strong><br>
+        <ins>Le taux d'intérêt est de 5.5% et le prix s'élève à 1500€.</ins>
+      </blockquote>
+    </section>
+
+    <!-- SECTION 5 : UNITÉS DE MESURE -->
+    <section>
+      <h2>5. Unités de Mesure (ISO & Impériales)</h2>
+      <h3>Pourquoi ?</h3>
+      <p>Les unités physiques (du système international ou impérial) forment un bloc sémantique indissociable avec la valeur numérique associée.</p>
+      <h3>Comment la règle opère ?</h3>
+      <p>Une expression régulière vérifie la présence d'abréviations d'unités lues immédiatement après un chiffre pour y appliquer l'espace fine insécable.</p>
+      
+      <blockquote>
+        <strong>Exemple Brut (Avant) :</strong><br>
+        <span class="no-typo">Le véhicule roulait à 90mph sur une distance de 15km par une température de 22°C.</span>
+      </blockquote>
+      <blockquote>
+        <strong>Exemple Corrigé (Après) :</strong><br>
+        <ins>Le véhicule roulait à 90mph sur une distance de 15km par une température de 22°C.</ins>
+      </blockquote>
+    </section>
+
+    <!-- SECTION 6 : TIRETS -->
+    <section>
+      <h2>6. Tirets de Dialogue et d'Incise</h2>
+      <h3>Pourquoi ?</h3>
+      <p>Les dialogues s'ouvrent par un tiret cadratin (—) suivi d'une espace insécable. Les incises se matérialisent par des tirets demi-cadratins (–) pour détacher une proposition du reste de la phrase.</p>
+      <h3>Comment la règle opère ?</h3>
+      <p>Le script identifie la position (début de ligne vs milieu de phrase), convertit les tirets courts et applique l'espace insécable normale réglementaire.</p>
+      
+      <blockquote>
+        <strong>Exemple Brut (Avant) :</strong><br>
+        <span class="no-typo">- Bonjour, dit-il.<br>- Comment allez-vous ?<br>L'informatique - discipline complexe - demande de la rigueur.</span>
+      </blockquote>
+      <blockquote>
+        <strong>Exemple Corrigé (Après) :</strong><br>
+        <ins>- Bonjour, dit-il.<br>- Comment allez-vous ?<br>L'informatique - discipline complexe - demande de la rigueur.</ins>
+      </blockquote>
+    </section>
+
+    <!-- SECTION 7 : GRANDS NOMBRES -->
+    <section>
+      <h2>7. Grands Nombres et Tableaux</h2>
+      <h3>Pourquoi ?</h3>
+      <p>Pour faciliter la lecture, les nombres longs se découpent par tranches de trois chiffres à l'aide d'espaces insécables. Dans un tableau, ce découpage est indispensable dès 4 chiffres pour aligner proprement les données.</p>
+      <h3>Comment la règle opère ?</h3>
+      <p>Le script détecte si le conteneur est une balise `<table>` pour abaisser le seuil d'activation à 4 chiffres (>=1000) au lieu de 5 chiffres (>=10000) pour le texte courant.</p>
+      
+      <blockquote>
+        <strong>Exemple Brut Courant (Avant) :</strong> <span class="no-typo">Il y a 2500 étudiants et 12500 livres.</span>
+      </blockquote>
+      <blockquote>
+        <strong>Exemple Corrigé Courant (Après) :</strong> <ins>Il y a 2500 étudiants et 12500 livres.</ins>
+      </blockquote>
+
+      <h3>Démonstration en Tableau Sémantique</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Donnée brute (Avant)</th>
+            <th>Rendu corrigé (Après)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="no-typo">8500</td>
+            <td>8500</td>
+          </tr>
+          <tr>
+            <td class="no-typo">142000.75</td>
+            <td>142000.75</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SECTION 8 : BALISE TIME -->
+    <section>
+      <h2>8. La Balise Spécifique &lt;time&gt;</h2>
+      <h3>Pourquoi ?</h3>
+      <p>La balise sémantique temporelle requiert un formatage d'espacement strict pour ses notations horaires et calendaires afin de garantir une mise en page fluide sans coupures inesthétiques.</p>
+      <h3>Comment la règle opère ?</h3>
+      <p>Le script isole l'élément `TIME` et applique des règles spécifiques pour insérer l'espace fine insécable entre les chiffres, les lettres d'unités (h, min, s) et les segments de dates.</p>
+      
+      <blockquote>
+        <strong>Exemple Brut (Avant) :</strong><br>
+        <time class="no-typo" datetime="2026-07-21T14:30">Mise à jour le 1er juillet 2026 à 14h30min</time>
+      </blockquote>
+      <blockquote>
+        <strong>Exemple Corrigé (Après) :</strong><br>
+        <ins><time datetime="2026-07-21T14:30">Mise à jour le 1er juillet 2026 à 14h30min</time></ins>
+      </blockquote>
+    </section>
+
+    <!-- SECTION 9 : EXCLUSION DE CLASSE -->
+    <section class="no-typo">
+      <h2>9. Exclusion manuelle via la classe "no-typo"</h2>
+      <h3>Pourquoi ?</h3>
+      <p>Certains cas spécifiques exigent l'arrêt complet des corrections, notamment pour du code ou des citations de langues tierces sans attribut `lang` déclaré.</p>
+      <h3>Comment la règle opère ?</h3>
+      <p>Si l'élément ou l'un de ses parents possède la classe `no-typo`, l'analyse s'interrompt instantanément.</p>
+      <blockquote>
+        <strong>Exemple (Devrait rester inchangé en écriture brute) :</strong><br>
+        Le texte ici ne bouge pas: "Test" d'écriture avec 15000$ d'investissement.
+      </blockquote>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© 2026 Lab Typographique — Outil conforme WCAG AA. Conçu pour le rendu universel de la langue française.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
