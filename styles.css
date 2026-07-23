@@ -1,0 +1,113 @@
+/* --- CONFIGURATION DES MODES DE COULEUR (CONFORME ACCESSIBILITÉ AA) --- */
+:root {
+  color-scheme: light dark;
+  --bg-color: #fcfcfc;
+  --text-color: #1a1a1a;
+  --primary-color: #1a365d; /* Bleu profond accessible AA sur fond clair */
+  --card-bg: #f0f4f8;
+  --accent-color: #c53030;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #121212;
+    --text-color: #e0e0e0;
+    --primary-color: #2b6cb0; /* Bleu adapté pour le contraste sur fond sombre */
+    --card-bg: #1e1e1e;
+    --accent-color: #feb2b2;
+  }
+}
+
+/* --- MISE EN PAGE ET FLUIDITÉ CSS MODERNE --- */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Typographie fluide : varie automatiquement entre 1rem (16px) et 1.5rem (24px) selon l'écran */
+  font-size: clamp(1rem, 0.85rem + 0.75vw, 1.5rem);
+  line-height: 1.6;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  
+  /* Grid Layout pour forcer le footer en bas et gérer les zones pleine largeur */
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+}
+
+/* Structures pleine largeur avec contenu centré dans une grille interne */
+header, footer {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  display: grid;
+  grid-template-columns: minmax(1rem, 1fr) min(75ch, 100%) minmax(1rem, 1fr);
+  padding: 2rem 0;
+}
+
+header > *, footer > * {
+  grid-column: 2;
+}
+
+footer a {
+  color: var(--accent-color);
+}
+
+/* Conteneur principal centré, limité à une largeur sémantique de 75ch */
+main {
+  display: grid;
+  grid-template-columns: minmax(1rem, 1fr) min(75ch, 100%) minmax(1rem, 1fr);
+  padding: 3rem 0;
+}
+
+main > * {
+  grid-column: 2;
+}
+
+/* --- CONCEPTION CLASSLESS SÉMANTIQUE --- */
+section {
+  background-color: var(--card-bg);
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 3rem;
+  border-left: 6px solid var(--primary-color);
+}
+
+h1, h2, h3 {
+  line-height: 1.2;
+  color: var(--primary-color);
+}
+
+header h1, footer p {
+  color: #ffffff;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+th, td {
+  border: 1px solid var(--text-color);
+  padding: 0.75rem;
+  text-align: left;
+}
+
+th {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+/* Éléments de démonstration avant/après */
+blockquote {
+  background: var(--bg-color);
+  border-left: 4px solid var(--accent-color);
+  margin: 1rem 0;
+  padding: 0.5rem 1rem;
+}
+
+ins {
+  text-decoration: none;
+  background-color: rgba(46, 160, 67, 0.15);
+}
