@@ -1,4 +1,4 @@
-/**
+/** JAVASCRIPT
  * Correcteur typographique pour la langue française v10.0
  * Conforme aux normes de l'Imprimerie nationale (FR) et de l'OQLF (CA).
  * 
