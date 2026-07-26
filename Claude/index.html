@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Démo correcteur typographique français</title>
+<style>
+  body { font-family: Georgia, serif; max-width: 640px; margin: 40px auto; line-height: 1.6; }
+  section { border: 1px solid #ddd; padding: 16px; margin-bottom: 16px; border-radius: 6px; }
+  h2 { font-size: 1rem; color: #555; margin-top: 0; }
+  code, pre { background: #f4f4f4; }
+</style>
+</head>
+<body>
+
+<h1>Démonstration : correcteur typographique français</h1>
+
+<section lang="fr">
+  <h2>Zone en français (traitée)</h2>
+  <p>Il a dit : "Je pars maintenant !" Elle a répondu : "Attends-moi !"</p>
+  <p>Vraiment ?! C'est incroyable ! Le prix est de 1234567 euros, soit 20% de réduction.</p>
+  <p>Il pesait 75kg pour 180cm, et roulait à 130km/h sur l'autoroute.</p>
+  <p>Voir p.42 et n°123 pour plus de détails. Dr. Martin et M. Dupont sont venus.</p>
+  <p>Le rendez-vous est à 14:30, voir http://example.com pour le plan.</p>
+  <p>Le chat - qui dormait tranquillement - s'est réveillé en sursaut.</p>
+  <p>Les mots composés comme peut-être, arc-en-ciel ou c'est-à-dire restent intacts.</p>
+  <p>Le 1er mai est férié. C'est la 1re fois qu'elle visite le 21e arrondissement.</p>
+
+  <div lang="en">
+    <p>This English text should NOT be touched, even "with quotes" and semicolons; like this. Nor the 1st ordinal or 20% sign.</p>
+  </div>
+
+  <form>
+    <label>Email : <input type="text" value="Test !? 1er essai - 20% ne doit pas être modifié"></label>
+    <textarea>Ce texte "avec guillemets" - et un ordinal 2e - ne doit pas être modifié.</textarea>
+    <button>Envoyer !</button>
+  </form>
+
+  <pre><code>const x = "code non modifié ! 1er - 20%";</code></pre>
+
+</section>
+
+<section>
+  <h2>Zone sans lang="fr" (non traitée)</h2>
+  <p>Texte : "avec guillemets droits" et ponctuation ! ? ; qui ne doit pas être touché. Ni le 1st ordinal.</p>
+</section>
+
+<script src="typo-fr.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    TypoFr.apply(); // applique sur tout le document ; ne traite que lang="fr"
+  });
+</script>
+
+</body>
+</html>
