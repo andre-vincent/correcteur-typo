@@ -1,5 +1,40 @@
 # correcteur-typo.js
-Correcteur Orthotypographique en JavaScrpt pour la langue française selon le *Lexique des règles typographiques en usage à l'Imprimerie nationale* (France) et *Le Ramat de la typographie* (Québec) qui pour l’essentiel des règles typographiques traitées par le script s’accordent.
+Correcteur Orthotypographique en JavaScript pour la langue française selon le *Lexique des règles typographiques en usage à l'Imprimerie nationale* (France) et *Le Ramat de la typographie* (Québec).
+
+## Installation
+
+1. Placez `correcteur-typo.js` dans votre projet.
+2. Ajoutez le script à votre page HTML :
+
+```html
+<script src="correcteur-typo.js"></script>
+```
+
+Le script s’exécute automatiquement au chargement de la page et corrige le contenu texte du `document.body`.
+
+## Usage
+
+- Par défaut, il corrige le texte en français dans le DOM.
+- Les éléments suivants sont exclus : `code`, `pre`, `script`, `style`, `input`, `textarea`, `select`, `button`, `option`.
+- Pour désactiver les corrections sur une portion de contenu :
+
+```html
+<div data-typo="off">
+  Texte exempté de correction.
+</div>
+```
+
+- La classe CSS `no-typo` fonctionne aussi comme exclusion :
+
+```html
+<p class="no-typo">Ce texte n’est pas corrigé.</p>
+```
+
+## Comportements notables
+
+- Le script gère les espaces insécables normales et fines selon les conventions typographiques françaises.
+- Il formate les grands nombres en conservant la partie décimale.
+- Il affine le traitement des tirets pour les dialogues et les incises.
 
 ## Références
 

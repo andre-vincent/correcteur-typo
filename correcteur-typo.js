@@ -36,6 +36,7 @@
   }
 
   const ESPACE_FINE = verifierSupportEspaceFine();
+  const ESPACE_NBSP = '\u00A0';
 
   // Liste des unités ISO et Impériales à lier au nombre qui les précède
   const REGEX_UNITES = new RegExp(
@@ -83,8 +84,8 @@
     texte = texte.replace(REGEX_UNITES, `${ESPACE_FINE}$1`);
 
     // RÈGLE 7 : Tirets de dialogue et d'incise (\u00A0 exigée)
-    texte = texte.replace(/^(?:[-–—]\s*)/gm, '—\u00A0');
-    texte = texte.replace(/\s+([-–—])\s+/g, ' –\u00A0');
+    texte = texte.replace(/(^|\n)[ \t]*[-–—][ \t]*/g, '$1—\u00A0');
+    texte = texte.replace(/(?<=\p{L})\s+([-–—])\s+(?=\p{L})/gu, ' –\u00A0');
 
     // RÈGLE 8 : Traitement spécifique pour la balise <time>
     if (estDansTime) {
@@ -95,17 +96,20 @@
     }
 
     // RÈGLE 9 : Grands nombres (Séparateur de milliers)
-    texte = texte.replace(/\b\d+[\d\s]*\b/g, (nombreGlobal) => {
-      let parties = nombreGlobal.split(/[,.]/);
-      let partieEntiere = parties[0].replace(/\s/g, '');
-      const seuilAtteint = estDansUnTableau ? (partieEntiere.length >= 4) : (partieEntiere.length >= 5);
+    texte = texte.replace(/\b-?\d+(?:[ \u00A0\u202F]\d{3})*(?:[.,]\d+)?\b/g, (nombreGlobal) => {
+      const signe = nombreGlobal.startsWith('-') ? '-' : '';
+      const corps = nombreGlobal.replace(/^-/, '');
+      const decimal = corps.match(/([.,]\d+)$/);
+      const partieDecimale = decimal ? decimal[0] : '';
+      let partieEntiere = decimal ? corps.slice(0, -partieDecimale.length) : corps;
+      partieEntiere = partieEntiere.replace(/[ \u00A0\u202F]/g, '');
+      const seuilAtteint = estDansUnTableau ? partieEntiere.length >= 4 : partieEntiere.length >= 5;
 
-      if (seuilAtteint) {
-        partieEntiere = partieEntiere.replace(/\B(?=(\d{3})+(?!\d))/g, ESPACE_FINE);
-        parties[0] = partieEntiere;
-        return parties.join(nombreGlobal.includes(',') ? ',' : '.');
-      }
-      return nombreGlobal;
+      if (!seuilAtteint) return nombreGlobal;
+
+      const separateur = estDansUnTableau ? ESPACE_NBSP : ESPACE_FINE;
+      partieEntiere = partieEntiere.replace(/\B(?=(\d{3})+(?!\d))/g, separateur);
+      return signe + partieEntiere + partieDecimale;
     });
 
     if (noeud.textContent !== texte) {
@@ -119,7 +123,7 @@
   function validerElement(element) {
     if (!element || element.nodeType !== Node.ELEMENT_NODE) return false;
     if (BALISES_A_EXCLURE.includes(element.tagName)) return false;
-    if (element.closest(`.${CLASSE_A_EXCLURE}`)) return false;
+    if (element.closest(`.${CLASSE_A_EXCLURE}`) || element.closest('[data-typo="off"]')) return false;
 
     const elementLangue = element.closest('[lang]');
     if (elementLangue && !elementLangue.getAttribute('lang').toLowerCase().startsWith('fr')) {
@@ -152,7 +156,7 @@
           const parent = noeud.parentElement;
           if (!parent) return NodeFilter.FILTER_REJECT;
           if (BALISES_A_EXCLURE.includes(parent.tagName)) return NodeFilter.FILTER_REJECT;
-          if (parent.closest(`.${CLASSE_A_EXCLURE}`)) return NodeFilter.FILTER_REJECT;
+          if (parent.closest(`.${CLASSE_A_EXCLURE}`) || parent.closest('[data-typo="off"]')) return NodeFilter.FILTER_REJECT;
 
           const elementLangue = parent.closest('[lang]');
           if (elementLangue && !elementLangue.getAttribute('lang').toLowerCase().startsWith('fr')) {
