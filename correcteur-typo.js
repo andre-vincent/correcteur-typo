@@ -1,14 +1,12 @@
 /** JAVASCRIPT
- * Correcteur typographique pour la langue française v10.2 (Modifié)
- * Avec liaison dynamique en temps réel entre .no-typo et .typo
+ * Correcteur typographique pour la langue française v10.3 (Stable)
+ * Gestion et liaison dynamique par blocs sémantiques cibles.
  */
 (function() {
   const BALISES_A_EXCLURE = ['CODE', 'PRE', 'SCRIPT', 'STYLE', 'INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'OPTION'];
-  const CLASSE_A_EXCLURE = 'no-typo';
 
-  // Sélections des éléments de l'interface
-  const source = document.querySelector('.no-typo');
-  const destination = document.querySelector('.typo');
+  // Sélection de tous les champs sources du laboratoire
+  const sources = document.querySelectorAll('.no-typo');
 
   /**
    * TEST DE RENDU PAR CANVAS
@@ -54,13 +52,13 @@
     const estDansUnTableau = parent ? parent.closest('table') !== null : false;
     const estDansTime = parent ? parent.closest('time') !== null : false;
 
-    // RÈGLE 1 : Apostrophes
+    // RÈGLE 1 : Apostrophes typographiques
     texte = texte.replace(/(?<=\p{L})[''](?=\p{L})/gu, '’');
 
     // RÈGLE 2 : Deux-points
     texte = texte.replace(/(?<!https?|ftp|mailto)(?<=\S)\s*:(?!\/|\d{2}\b)/gi, '\u00A0:');
 
-    // RÈGLE 3 : Ponctuation double
+    // RÈGLE 3 : Ponctuation double (; ! ?)
     texte = texte.replace(/\s*([;!?]+)/g, `${ESPACE_FINE}$1`);
 
     // RÈGLE 4 : Guillemets français
@@ -74,15 +72,15 @@
     texte = texte.replace(/(?<=\d)\s*([$€£¥₣₩元])/g, `${ESPACE_FINE}$1`);
     texte = texte.replace(/(?<=\d)\s*([%‰₱])/g, `${ESPACE_FINE}$1`);
 
-    // RÈGLE 6 : Unités de mesure
+    // RÈGLE 6 : Unités de mesure physiques
     REGEX_UNITES.lastIndex = 0;
     texte = texte.replace(REGEX_UNITES, `${ESPACE_FINE}$1`);
 
-    // RÈGLE 7 : Tirets
+    // RÈGLE 7 : Tirets de dialogue et d'incise
     texte = texte.replace(/^(?:[-–—]\s*)/gm, '—\u00A0');
     texte = texte.replace(/\s+([-–—])\s+/g, ' –\u00A0');
 
-    // RÈGLE 8 : Balise <time>
+    // RÈGLE 8 : Traitement spécifique pour la balise <time>
     if (estDansTime) {
       texte = texte.replace(/(?<=\d)\s*(h|min|s)(?=\s|\d|$)/gi, `${ESPACE_FINE}$1`);
       texte = texte.replace(/(?<=(h|min))\s*(?=\d)/gi, ESPACE_FINE);
@@ -90,8 +88,8 @@
       texte = texte.replace(/(?<=^|\s)(1er)\s+([a-zéû]+)\s+(\d{4})(?=$|\s)/gi, `$1${ESPACE_FINE}$2${ESPACE_FINE}$3`);
     }
 
-    // RÈGLE 9 : Grands nombres
-    // MODIFICATION : \u00A0 dans les <table>, ESPACE_FINE ailleurs.
+    // RÈGLE 9 : Grands nombres (Séparateur de milliers)
+    // FIX : Utilisation correcte de la variable parties[0] au lieu du tableau entier
     texte = texte.replace(/\b\d+[\d\s]*\b/g, (nombreGlobal) => {
       let parties = nombreGlobal.split(/[,.]/);
       let partieEntiere = parties[0].replace(/\s/g, '');
@@ -112,16 +110,19 @@
   }
 
   /**
-   * Vérification de validité de l'élément cible
+   * Vérifie si la langue française est active et valide l'élément parent
    */
   function validerElement(element) {
     if (!element || element.nodeType !== Node.ELEMENT_NODE) return false;
     if (BALISES_A_EXCLURE.includes(element.tagName)) return false;
 
-    // ATTENTION : On supprime ici l'exclusion de la classe 'no-typo' uniquement pour
-    // l'élément racine de destination afin de pouvoir y appliquer les corrections.
-    if (element.classList.contains(CLASSE_A_EXCLURE) && element !== destination) return false;
-    if (element.closest(`.${CLASSE_A_EXCLURE}`) && !element.closest('.typo')) return false;
+    // FIX : Si l'élément est (ou est à l'intérieur de) la cible de rendu corrigée, 
+    // on AUTHORISE le traitement peu importe s'il contient encore la classe source copiée.
+    const estDansRenduCible = element.closest('ins') || element.closest('[id^="td-"]') || element.closest('time');
+    if (estDansRenduCible) return true;
+
+    // Protection classique hors zones de rendu du lab
+    if (element.closest('.no-typo')) return false;
 
     const elementLangue = element.closest('[lang]');
     if (elementLangue && !elementLangue.getAttribute('lang').toLowerCase().startsWith('fr')) {
@@ -131,28 +132,18 @@
   }
 
   /**
-   * Parcours du DOM via TreeWalker
+   * Parcours du DOM local via TreeWalker
    */
-  function corrigerTypographieFrancaise(racine) {
-    if (!racine || !validerElement(racine)) return;
+  function corrigerZone(cible) {
+    if (!cible) return;
 
     const walker = document.createTreeWalker(
-      racine,
+      cible,
       NodeFilter.SHOW_TEXT,
       {
         acceptNode: function(noeud) {
           const parent = noeud.parentElement;
-          if (!parent) return NodeFilter.FILTER_REJECT;
-          if (BALISES_A_EXCLURE.includes(parent.tagName)) return NodeFilter.FILTER_REJECT;
-          
-          // Sécurité additionnelle pour l'arbre
-          if (parent.closest(`.${CLASSE_A_EXCLURE}`) && !parent.closest('.typo')) return NodeFilter.FILTER_REJECT;
-
-          const elementLangue = parent.closest('[lang]');
-          if (elementLangue && !elementLangue.getAttribute('lang').toLowerCase().startsWith('fr')) {
-            return NodeFilter.FILTER_REJECT;
-          }
-
+          if (!parent || !validerElement(parent)) return NodeFilter.FILTER_REJECT;
           return NodeFilter.FILTER_ACCEPT;
         }
       }
@@ -162,30 +153,47 @@
     while (walker.nextNode()) {
       noeudsATraiter.push(walker.currentNode);
     }
-
     noeudsATraiter.forEach(corrigerNoeudTexte);
   }
 
-  // --- SCRIPT DE LIAISON (ÉCOUTEUR D'ÉVÉNEMENT) ---
-  function executerLiaisonEtCorrection() {
-    if (!source || !destination) return;
-    
-    // 1. Duplication instantanée du HTML
-    destination.innerHTML = source.innerHTML;
-    
-    // 2. Lancement du traitement typographique sur le bloc cible uniquement
-    corrigerTypographieFrancaise(destination);
+  /**
+   * Transfère et nettoie le contenu vers la cible associée
+   */
+  function synchroniserElement(source) {
+    const targetId = source.getAttribute('data-target');
+    const cible = document.getElementById(targetId);
+    if (!cible) return;
+
+    // 1. Duplication propre (textContent s'il n'y a pas de sous-balises, innerHTML sinon)
+    if (source.tagName === 'SPAN' && !source.querySelector('*')) {
+      cible.textContent = source.textContent;
+    } else {
+      cible.innerHTML = source.innerHTML;
+    }
+
+    // 2. Lancement du correcteur typographique ciblé
+    corrigerZone(cible);
   }
 
-  // Écoute de l'activité sur la zone éditable
-  if (source) {
-    source.addEventListener('input', executerLiaisonEtCorrection);
+  /**
+   * Initialisation des écouteurs d'événements
+   */
+  function démarrer() {
+    sources.forEach(source => {
+      // Synchronisation et rendu initial
+      synchroniserElement(source);
+
+      // Écoute dynamique à chaque frappe de touche (Performances optimales via événement input localisé)
+      source.addEventListener('input', () => {
+        synchroniserElement(source);
+      });
+    });
   }
 
-  // Synchronisation initiale au chargement
-  document.addEventListener('DOMContentLoaded', executerLiaisonEtCorrection);
-  if (document.readyState !== 'loading') {
-    executerLiaisonEtCorrection();
+  // Chargement sécurisé du script
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', démarrer);
+  } else {
+    démarrer();
   }
 })();
-</script>
