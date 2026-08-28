@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test du Correcteur Typographique v22</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>Test du Correcteur Typographique</h1>
+    <p>Cette page permet de valider visuellement l'exécution du script de correction typographique française (v22).</p>
+  </header>
+
+  <main>
+    <article>
+      
+      <!-- Règle 2 -->
+      <section>
+        <h2>Règle 2 : Séparateur des milliers conditionnel</h2>
+        <h3>Pourquoi cette règle</h3>
+        <p>En français, les grands nombres s'écrivent avec des espaces pour faciliter la lecture. Les tableaux (cellules TD) tolèrent ce formatage dès 4 chiffres pour aligner les données, tandis que le texte courant applique la règle à partir de 5 chiffres.</p>
+        <h3>Comment la règle opère</h3>
+        <p>Le script repère les suites de chiffres et y injecte une espace fine insécable par groupes de trois, tout en respectant le séparateur décimal d'origine.</p>
+        <h3>Exemple</h3>
+        <h4>Saisie brute</h4>
+        <pre><code class="no-typo">Hors tableau : 1000 et 10000. Dans un tableau : 1000 et 10000.5</code></pre>
+        <h4>Texte corrigé</h4>
+        <p>Hors tableau : 1000 et 10000. Le séparateur décimal d'origine est préservé, par exemple 12500.75 ou 45000,50.</p>
+        <table>
+          <caption>Exemple de rendu dans un tableau</caption>
+          <thead>
+            <tr><th>Valeur brute</th><th>Rendu dans TD</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1000</td><td>1000</td></tr>
+            <tr><td>10000</td><td>10000</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Règle 3 -->
+      <section>
+        <h2>Règle 3 : Formats horaires abrégés</h2>
+        <h3>Pourquoi cette règle</h3>
+        <p>Le symbole « h » servant de séparateur horaire doit être lié de manière solidaire aux heures et aux minutes pour éviter un retour à la ligne disgracieux au milieu de l'expression.</p>
+        <h3>Comment la règle opère</h3>
+        <p>Le script entoure le caractère « h » d'espaces fines insécables lorsqu'il est placé entre des chiffres.</p>
+        <h3>Exemple</h3>
+        <h4>Saisie brute</h4>
+        <pre><code class="no-typo">Le rendez-vous est fixé à 14h30 précise ou à 18 h.</code></pre>
+        <h4>Texte corrigé</h4>
+        <p>Le rendez-vous est fixé à 14h30 précise ou à 18 h.</p>
+      </section>
+
+      <!-- Règle 4 -->
+      <section>
+        <h2>Règle 4 : Devises et Unités de mesure</h2>
+        <h3>Pourquoi cette règle</h3>
+        <p>Les symboles monétaires et les abréviations d'unités de mesure doivent toujours être séparés de leur valeur quantitative par un espace réduit et non sécable.</p>
+        <h3>Comment la règle opère</h3>
+        <p>Une espace fine insécable est automatiquement insérée entre le dernier chiffre et le symbole détecté.</p>
+        <h3>Exemple</h3>
+        <h4>Saisie brute</h4>
+        <pre><code class="no-typo">Le prix est de 15€ pour une distance de 5km avec une pente à 10%.</code></pre>
+        <h4>Texte corrigé</h4>
+        <p>Le prix est de 15€ pour une distance de 5km avec une pente à 10%.</p>
+      </section>
+
+      <!-- Règle 5 -->
+      <section>
+        <h2>Règle 5 : Ponctuations hautes</h2>
+        <h3>Pourquoi cette règle</h3>
+        <p>Les signes de ponctuation composés de deux éléments (point d'exclamation, point d'interrogation, point-virgule) requièrent un espace les précédant pour respirer visuellement.</p>
+        <h3>Comment la règle opère</h3>
+        <p>Le script normalise l'espace existant (ou comble son absence) par une espace fine insécable unique.</p>
+        <h3>Exemple</h3>
+        <h4>Saisie brute</h4>
+        <pre><code class="no-typo">Incroyable! Êtes-vous prêt? Veuillez patienter; le script s'exécute.</code></pre>
+        <h4>Texte corrigé</h4>
+        <p>Incroyable! Êtes-vous prêt? Veuillez patienter; le script s'exécute.</p>
+      </section>
+
+      <!-- Règle 6 -->
+      <section>
+        <h2>Règle 6 : Le deux-points</h2>
+        <h3>Pourquoi cette règle</h3>
+        <p>À la différence des autres ponctuations hautes, le deux-points demande une séparation visuelle plus marquée, matérialisée par une espace insécable de largeur normale.</p>
+        <h3>Comment la règle opère</h3>
+        <p>Toute absence ou présence d'espace standard avant un deux-points est convertie en une espace insécable classique.</p>
+        <h3>Exemple</h3>
+        <h4>Saisie brute</h4>
+        <pre><code class="no-typo">Voici la liste: des pommes, des poires.</code></pre>
+        <h4>Texte corrigé</h4>
+        <p>Voici la liste: des pommes, des poires.</p>
+      </section>
+
+      <!-- Règle 7 -->
+      <section>
+        <h2>Règle 7 : Guillemets français</h2>
+        <h3>Pourquoi cette règle</h3>
+        <p>Les guillemets typographiques français (« ») encadrent une expression et exigent des espaces internes pour se détacher proprement du texte qu'ils protègent.</p>
+        <h3>Comment la règle opère</h3>
+        <p>Le script ajoute une espace fine insécable juste après le guillemet ouvrant et juste avant le guillemet fermant.</p>
+        <h3>Exemple</h3>
+        <h4>Saisie brute</h4>
+        <pre><code class="no-typo">Il a dit : «Bienvenue chez vous».</code></pre>
+        <h4>Texte corrigé</h4>
+        <p>Il a dit : «Bienvenue chez vous».</p>
+      </section>
+
+      <!-- Règle 8 -->
+      <section>
+        <h2>Règle 8 : Apostrophe droite dactylographique</h2>
+        <h3>Pourquoi cette règle</h3>
+        <p>L'apostrophe droite est un héritage des machines à écrire. Une édition soignée exige l'usage de l'apostrophe courbe, plus élégante et naturelle au sein du texte.</p>
+        <h3>Comment la règle opère</h3>
+        <p>Le script cible spécifiquement les apostrophes droites entourées de caractères de l'écriture latine étendue pour opérer la substitution.</p>
+        <h3>Exemple</h3>
+        <h4>Saisie brute</h4>
+        <pre><code class="no-typo">C'est l'histoire d'un élève d'aujourd'hui.</code></pre>
+        <h4>Texte corrigé</h4>
+        <p>C'est l'histoire d'un élève d'aujourd'hui.</p>
+      </section>
+
+    </article>
+  </main>
+
+  <footer>
+    <p>Page de validation d'accessibilité AA — Conforme aux règles d'affichage fluide.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
