@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banc d'essai - Correcteur ortho-typographique</title>
+  <style>
+    /* --- Base & Typographie Classless --- */
+    :root {
+      --bg-color: #f9f9fb;
+      --card-bg: #ffffff;
+      --text-color: #2d3748;
+      --accent-color: #4a5568;
+      --border-color: #e2e8f0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 0;
+    }
+    header, footer {
+      background-color: var(--accent-color);
+      color: white;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    header p, footer p {
+      margin: 0.5rem 0 0 0;
+      opacity: 0.9;
+    }
+
+    /* --- Grid Layout Adaptatif (Responsive) --- */
+    main {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+    }
+
+    /* --- Structure des Articles (Cards) --- */
+    article {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 1.25rem;
+      color: #1a202c;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+    article > p {
+      font-size: 0.9rem;
+      color: #718096;
+      flex-grow: 1; /* Aligne le bas des sections d'exemples */
+    }
+
+    /* --- Sections de Comparaison --- */
+    section {
+      background: #f7fafc;
+      border-left: 4px solid var(--accent-color);
+      padding: 0.75rem 1rem;
+      margin-top: 1rem;
+      border-radius: 0 4px 4px 0;
+    }
+    section p {
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+    }
+    /* Sélectionne le premier paragraphe (Avant) et le second (Après) */
+    section p:first-of-type::before {
+      content: "❌ Avant : ";
+      font-weight: bold;
+      color: #e53e3e;
+    }
+    section p:last-of-type::before {
+      content: "✅ Après : ";
+      font-weight: bold;
+      color: #38a169;
+    }
+    
+    /* Style optionnel pour mettre en valeur les cellules de tableau */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+    }
+    td {
+      border: 1px solid var(--border-color);
+      padding: 0.5rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Laboratoire de validation typographique</h1>
+    <p>Démonstration interactive des règles de l'Imprimerie Nationale</p>
+  </header>
+
+  <main>
+    <!-- Règle 1 -->
+    <article>
+      <h2>1. L'apostrophe courbe</h2>
+      <p>L'apostrophe droite (') doit être remplacée par une apostrophe courbe (’) exclusivement lorsqu'elle se trouve au cœur d'un mot (élision).</p>
+      <section>
+        <p class="no-typo">C'est l'été, d'accord ?</p>
+        <p>C'est l'été, d'accord ?</p>
+      </section>
+    </article>
+
+    <!-- Règle 2 -->
+    <article>
+      <h2>2. Les grands nombres (Texte)</h2>
+      <p>Les nombres de 5 chiffres et plus reçoivent une espace fine insécable. Les nombres à 4 chiffres (comme les années) restent soudés.</p>
+      <section>
+        <p class="no-typo">En 2026, la population augmentera de 15000 habitants.</p>
+        <p>En 2026, la population augmentera de 15000 habitants.</p>
+      </section>
+    </article>
+
+    <!-- Règle 3 -->
+    <article>
+      <h2>3. Les grands nombres (Tableau)</h2>
+      <p>Dans les cellules de tableau (TD), la séparation par blocs de 3 chiffres s'applique dès 4 chiffres pour préserver l'alignement visuel.</p>
+      <section>
+        <table class="no-typo"><tr><td>1500</td></tr></table>
+        <table><tr><td>1500</td></tr></table>
+      </section>
+    </article>
+
+    <!-- Règle 4 -->
+    <article>
+      <h2>4. Les devises et symboles</h2>
+      <p>Une espace fine insécable doit séparer un nombre du symbole monétaire ou de pourcentage qui le suit.</p>
+      <section>
+        <p class="no-typo">Le taux d'intérêt est à 5% pour un gain de 2500€.</p>
+        <p>Le taux d'intérêt est à 5% pour un gain de 2500€.</p>
+      </section>
+    </article>
+
+    <!-- Règle 5 -->
+    <article>
+      <h2>5. Les unités de mesure</h2>
+      <p>Les unités physiques (cm, kg, km/h, °C) requièrent une espace fine insécable après le nombre, sans corrompre les mots usuels.</p>
+      <section>
+        <p class="no-typo">Le colis de 12kg a roulé sur 50km à 130km/h par 35°C.</p>
+        <p>Le colis de 12kg a roulé sur 50km à 130km/h par 35°C.</p>
+      </section>
+    </article>
+
+    <!-- Règle 6 -->
+    <article>
+      <h2>6. Les civilités et abréviations</h2>
+      <p>Les abréviations comme M., Mme, Dr ou Cie doivent être solidarisées avec le mot suivant via une espace insécable standard.</p>
+      <section>
+        <p class="no-typo">Le Dr Dupont et Mme Martin travaillent pour la Cie Générale.</p>
+        <p>Le Dr Dupont et Mme Martin travaillent pour la Cie Générale.</p>
+      </section>
+    </article>
+
+    <!-- Règle 7 -->
+    <article>
+      <h2>7. Les tirets de dialogue</h2>
+      <p>Les tirets en début de ligne (- ou --) se transforment en tiret cadratin (—) suivi d'une espace insécable standard.</p>
+      <section>
+        <p class="no-typo">- Bonjour !<br>-- Comment allez-vous ?</p>
+        <p>- Bonjour !<br>-- Comment allez-vous ?</p>
+      </section>
+    </article>
+
+    <!-- Règle 8 -->
+    <article>
+      <h2>8. Les tirets d'incise</h2>
+      <p>Les incises de phrases s'encadrent de tirets demi-cadratins (–) bordés d'espaces insécables standards à l'intérieur de l'incise.</p>
+      <section>
+        <p class="no-typo">Cette règle - dit-il - est essentielle pour la mise en page.</p>
+        <p>Cette règle - dit-il - est essentielle pour la mise en page.</p>
+      </section>
+    </article>
+
+    <!-- Règle 9 -->
+    <article>
+      <h2>9. Les guillemets</h2>
+      <p>Les guillemets droits (") sont remplacés par des guillemets français (« ») intégrant des espaces fines insécables à l'intérieur.</p>
+      <section>
+        <p class="no-typo">Elle s'exclama : "C'est une réussite total !".</p>
+        <p>Elle s'exclama : "C'est une réussite total !".</p>
+      </section>
+    </article>
+
+    <!-- Règle 10 -->
+    <article>
+      <h2>10. La ponctuation double & deux-points</h2>
+      <p>Les signes !, ?, ; requièrent une espace fine insécable. Le deux-points (:) réclame une espace insécable standard.</p>
+      <section>
+        <p class="no-typo">Regarde ceci: un test! Prêt? C'est parti;</p>
+        <p>Regarde ceci: un test! Prêt? C'est parti;</p>
+      </section>
+    </article>
+  </main>
+
+  <footer>
+    <p>Banc d'essai généré automatiquement conforme Imprimerie Nationale.</p>
+  </footer>
+
+  <!-- Inclusion du script de correction typographique -->
+  <script>
+    /* Correcteur ortho-typographique pour la langue française - Version 4 */
+
+    function formaterNombresFrancais(text, estDansUnTableau = false) {
+      return text.replace(/\b\d+(?:\s\d+)*\b/g, (match) => {
+        const nombreBrut = match.replace(/\s/g, '');
+        const limiteChiffres = estDansUnTableau ? 4 : 5;
+        if (nombreBrut.length < limiteChiffres) return nombreBrut;
+        return nombreBrut.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F');
+      });
+    }
+
+    function corrigerTypographieFrancaiseComplete(text, estDansUnTableau = false) {
+      if (!text) return "";
+      let transforme = text.replace(/(\p{L})'(\p{L})/gu, '$1’$2');
+      transforme = formaterNombresFrancais(transforme, estDansUnTableau);
+
+      return transforme
+        .replace(/(\d)[\s\u00A0\u202F]?([€$£¥%‰])/g, '$1\u202F$2')
+        .replace(/(\d)[\s\u00A0\u202F]?(m|cm|mm|km|g|kg|t|L|ml|km\/h|kg\/h|°C|°F|Hz|W|kW|Wh|kWh)\b/g, '$1\u202F$2')
+        .replace(/\b(M\.|Mme|Mlle|Dr|Me|Mgr|Cie)[\s\u00A0\u202F]?(\p{L})/gu, '$1\u00A0$2')
+        .replace(/^(?:--|-|—)\s*/gm, '—\u00A0')
+        .replace(/(\s)(?:--|-|—)(\s)/g, '$1–\u00A0')
+        .replace(/(\s)(?:--|-|—)([\s,.?!;:]|$)/g, '\u00A0–$2')
+        .replace(/(^|\s)"\s*/g, '$1«\u202F')
+        .replace(/\s*"/g, '\u202F»')
+        .replace(/(«)[\s\u00A0\u202F]?(.*?)/g, '$1\u202F$2')
+        .replace(/[\s\u00A0\u202F]?(»)/g, '\u202F$1')
+        .replace(/[\s\u00A0\u202F]?([!?;&])/g, '\u202F$1')
+        .replace(/[\s\u00A0\u202F]?(:)/g, '\u00A0$1');
+    }
+
+    function appliquerTypographieAutomatique() {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      let currentNode;
+      while (currentNode = walker.nextNode()) {
+        const parentNode = currentNode.parentNode;
+        if (!parentNode) continue;
+        const parentTag = parentNode.tagName;
+
+        if (parentTag !== 'SCRIPT' && parentTag !== 'STYLE' && parentTag !== 'CODE' && parentTag !== 'TEXTAREA') {
+          if (parentNode.closest('.no-typo')) continue;
+          
+          const elementAvecLangue = parentNode.closest('[lang]');
+          const langueDuContexte = elementAvecLangue ? elementAvecLangue.getAttribute('lang').toLowerCase() : '';
+          
+          if (langueDuContexte.startsWith('fr')) {
+            const estDansUnTableau = !!parentNode.closest('td');
+            currentNode.nodeValue = corrigerTypographieFrancaiseComplete(currentNode.nodeValue, estDansUnTableau);
+          }
+        }
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", appliquerTypographieAutomatique);
+  </script>
+</body>
+</html>
