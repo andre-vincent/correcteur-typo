@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Banc d'essai et laboratoire de validation typographique interactive pour tester le script de correction automatique conforme aux règles de l'Imprimerie Nationale.">
   <title>Banc d'essai - Correcteur ortho-typographique</title>
-  <meta name="description" content="Correcteur typographique pour la langue française = v4">  <style>
+  <style>
     /* --- Base & Typographie Classless --- */
     :root {
-      --bg-color: #f9f9fb;
+      /* Couleurs contrastées conformes WCAG AA (Rapport > 7:1) */
+      --bg-color: #f7fafc;
       --card-bg: #ffffff;
-      --text-color: #2d3748;
-      --accent-color: #4a5568;
-      --border-color: #e2e8f0;
+      --text-color: #1a202c; /* Noir profond hautement lisible */
+      --accent-color: #1a202c;
+      --border-color: #718096; /* Gris foncé pour des bordures visibles */
+      --muted-text: #4a5568;  /* Gris foncé contrasté pour les descriptions */
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -23,21 +26,21 @@
     }
     header, footer {
       background-color: var(--accent-color);
-      color: white;
+      color: #ffffff;
       text-align: center;
       padding: 2rem 1rem;
     }
     header p, footer p {
       margin: 0.5rem 0 0 0;
-      opacity: 0.9;
+      opacity: 0.95;
     }
 
     /* --- Grid Layout Adaptatif (Responsive) --- */
     main {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
       gap: 2rem;
-      max-width: 1200px;
+      max-width: 75rem;
       margin: 3rem auto;
       padding: 0 1rem;
     }
@@ -45,59 +48,59 @@
     /* --- Structure des Articles (Cards) --- */
     article {
       background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
+      border: 0.0625rem solid var(--border-color);
+      border-radius: 0.5rem;
       padding: 1.5rem;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 0.25rem 0.375rem -0.0625rem rgba(0, 0, 0, 0.1);
     }
     h2 {
       margin-top: 0;
       font-size: 1.25rem;
-      color: #1a202c;
-      border-bottom: 2px solid var(--border-color);
+      color: var(--text-color);
+      border-bottom: 0.125rem solid var(--border-color);
       padding-bottom: 0.5rem;
     }
     article > p {
-      font-size: 0.9rem;
-      color: #718096;
+      font-size: 0.9375rem;
+      color: var(--muted-text);
       flex-grow: 1; /* Aligne le bas des sections d'exemples */
     }
 
     /* --- Sections de Comparaison --- */
     section {
-      background: #f7fafc;
-      border-left: 4px solid var(--accent-color);
+      background: #edf2f7;
+      border-left: 0.25rem solid var(--accent-color);
       padding: 0.75rem 1rem;
       margin-top: 1rem;
-      border-radius: 0 4px 4px 0;
+      border-radius: 0 0.25rem 0.25rem 0;
     }
     section p {
       margin: 0.5rem 0;
-      font-size: 0.95rem;
+      font-size: 1rem;
     }
-    /* Sélectionne le premier paragraphe (Avant) et le second (Après) */
+    /* Pseudo-éléments utilisant em pour s'adapter à la taille de la police */
     section p:first-of-type::before {
       content: "❌ Avant : ";
       font-weight: bold;
-      color: #e53e3e;
+      color: #c53030; /* Rouge foncé accessible */
     }
     section p:last-of-type::before {
       content: "✅ Après : ";
       font-weight: bold;
-      color: #38a169;
+      color: #22543d; /* Vert foncé accessible */
     }
     
-    /* Style optionnel pour mettre en valeur les cellules de tableau */
+    /* Structure de Tableau */
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 0.5rem;
     }
     td {
-      border: 1px solid var(--border-color);
-      padding: 0.5rem;
+      border: 0.0625rem solid var(--border-color);
+      padding: 0.5em;
       text-align: center;
     }
   </style>
@@ -195,8 +198,8 @@
       <h2>9. Les guillemets</h2>
       <p>Les guillemets droits (") sont remplacés par des guillemets français (« ») intégrant des espaces fines insécables à l'intérieur.</p>
       <section>
-        <p class="no-typo">Elle s'exclama : "C'est une réussite total !".</p>
-        <p>Elle s'exclama : "C'est une réussite total !".</p>
+        <p class="no-typo">Elle s'exclama : "C'est une réussite totale !".</p>
+        <p>Elle s'exclama : "C'est une réussite totale !".</p>
       </section>
     </article>
 
@@ -214,6 +217,7 @@
   <footer>
     <p>Banc d'essai généré automatiquement conforme Imprimerie Nationale.</p>
   </footer>
+
 
   <!-- Inclusion du script de correction typographique -->
   <script>
