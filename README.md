@@ -5,7 +5,7 @@ Version la plus récente :
 - https://andre-vincent.github.io/correcteur-typo/v4/
 
 Score Light House
-- [Google PageSpeed)(https://pagespeed.web.dev/analysis/https-andre-vincent-github-io-correcteur-typo-v4/2dnpcpkibo?form_factor=mobile)
+- [Google PageSpeed](https://pagespeed.web.dev/analysis/https-andre-vincent-github-io-correcteur-typo-v4/2dnpcpkibo?form_factor=mobile)
 
 ## Installation
 
