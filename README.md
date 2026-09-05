@@ -2,7 +2,10 @@
 Correcteur Orthotypographique en JavaScript pour la langue française selon le *Lexique des règles typographiques en usage à l'Imprimerie nationale* (France) et *Le Ramat de la typographie* (Québec).
 
 Version la plus récente :
-- (https://andre-vincent.github.io/correcteur-typo/v4/)
+- https://andre-vincent.github.io/correcteur-typo/v4/
+
+Score Light House
+- [Google PageSpeed)(https://pagespeed.web.dev/analysis/https-andre-vincent-github-io-correcteur-typo-v4/2dnpcpkibo?form_factor=mobile)
 
 ## Installation
 
