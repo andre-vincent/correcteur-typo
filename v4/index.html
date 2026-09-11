@@ -83,12 +83,13 @@
     /* Pseudo-éléments utilisant em pour s'adapter à la taille de la police */
     section p:first-of-type::before {
       content: "❌ Avant : \A";
-      text-wrap: pre;
+      white-space: pre-wrap;
       font-weight: bold;
       color: #c53030; /* Rouge foncé accessible */
     }
     section p:last-of-type::before {
-      content: "✅ Après : ";
+      content: "✅ Après : \A ";
+      white-space: pre-wrap;
       font-weight: bold;
       color: #22543d; /* Vert foncé accessible */
     }
