@@ -82,7 +82,8 @@
     }
     /* Pseudo-éléments utilisant em pour s'adapter à la taille de la police */
     section p:first-of-type::before {
-      content: "❌ Avant : ";
+      content: "❌ Avant : \A";
+      text-wrap: pre;
       font-weight: bold;
       color: #c53030; /* Rouge foncé accessible */
     }
