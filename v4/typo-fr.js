@@ -1,109 +1,240 @@
-/* Correcteur ortho-typographique pour la langue française - Version 4 */
-
-/**
- * Formate les nombres selon les règles de l'Imprimerie Nationale
- * @param {string} text - Le texte brut à analyser
- * @param {boolean} estDansUnTableau - Si vrai, formate dès 4 chiffres. Si faux, dès 5 chiffres.
- * @returns {string} - Le texte avec les espaces fines insécables
+/** JAVASCRIPT
+ * Correcteur typographique pour la langue française v4.2
+ * Conforme aux normes de l'Imprimerie nationale (FR) et de l'OQLF (CA).
+ * 
+ * Optimisé avec document.createTreeWalker et NodeFilter.
+ * Traite les nœuds de texte de façon native sans altérer la structure du DOM.
  */
-function formaterNombresFrancais(text, estDansUnTableau = false) {
-  return text.replace(/\b\d+(?:\s\d+)*\b/g, (match) => {
-    const nombreBrut = match.replace(/\s/g, '');
-    const limiteChiffres = estDansUnTableau ? 4 : 5;
+(function() {
+  const BALISES_A_EXCLURE = ['CODE', 'PRE', 'SCRIPT', 'STYLE', 'INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'OPTION'];
+  const CLASSE_A_EXCLURE = 'no-typo';
+  let observateurDynamique = null;
+  
+  // Drapeau de sécurité bloquant les boucles infinies de mutations
+  let estEnTrainDeCorriger = false;
 
-    if (nombreBrut.length < limiteChiffres) {
-      return nombreBrut;
-    }
+  /**
+   * TEST DE RENDU PAR CANVAS
+   * Vérifie si le système sait dessiner le caractère U+202F.
+   * Si la largeur est identique à un caractère inexistant (U+FFFF) ou nulle,
+   * active le fallback automatique vers l'espace insécable classique (\u00A0).
+   */
+  function verifierSupportEspaceFine() {
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return '\u00A0';
 
-    return nombreBrut.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F');
-  });
-}
+      ctx.font = '16px sans-serif';
+      const largeurInvalide = ctx.measureText('\uFFFF').width;
+      const largeurFine = ctx.measureText('\u202F').width;
 
-/**
- * Fonction globale incluant toute la typographie française, devises, unités, abréviations et tirets
- */
-function corrigerTypographieFrancaiseComplete(text, estDansUnTableau = false) {
-  if (!text) return "";
-
-  let transforme = text
-    // RÈGLE : Conversion des apostrophes droites (') en apostrophes courbes (’) uniquement entre deux lettres (élisions)
-    .replace(/(\p{L})'(\p{L})/gu, '$1’$2');
-
-  // RÈGLE : Espacement des milliers par blocs de 3 (espace fine insécable \u202F). Dès 5 chiffres en texte continu, dès 4 chiffres en tableau (cellules td).
-  transforme = formaterNombresFrancais(transforme, estDansUnTableau);
-
-  transforme = transforme
-    // RÈGLE : Devises et symboles (€, $, %, etc.) précédés d'une espace fine insécable (\u202F) pour rester soudés au nombre
-    .replace(/(\d)[\s\u00A0\u202F]?([€$£¥%‰])/g, '$1\u202F$2')
-
-    // RÈGLE : Unités de mesure physiques (cm, kg, km/h, etc.) précédées d'une espace fine insécable (\u202F) sans altérer les mots ordinaires
-    .replace(/(\d)[\s\u00A0\u202F]?(m|cm|mm|km|g|kg|t|L|ml|km\/h|kg\/h|°C|°F|Hz|W|kW|Wh|kWh)\b/g, '$1\u202F$2')
-
-    // RÈGLE : Abréviations de civilité et titres (M., Mme, Dr, Cie, etc.) suivis d'une espace insécable standard (\u00A0) pour ne pas être séparés du nom
-    .replace(/\b(M\.|Mme|Mlle|Dr|Me|Mgr|Cie)[\s\u00A0\u202F]?(\p{L})/gu, '$1\u00A0$2')
-
-    // RÈGLE : Dialogues - Conversion des tirets simples ou doubles en début de ligne par un tiret cadratin (—) suivi d'une espace insécable standard (\u00A0)
-    .replace(/^(?:--|-|—)\s*/gm, '—\u00A0')
-
-    // RÈGLE : Incises (ouvrantes) - Remplacement des tirets isolés au milieu d'une phrase par un tiret demi-cadratin (–) suivi d'une espace insécable standard (\u00A0)
-    .replace(/(\s)(?:--|-|—)(\s)/g, '$1–\u00A0')
-
-    // RÈGLE : Incises (fermantes) - Ajustement du tiret demi-cadratin (–) pour qu'il soit précédé d'une espace insécable standard (\u00A0) avant une ponctuation ou une espace
-    .replace(/(\s)(?:--|-|—)([\s,.?!;:]|$)/g, '\u00A0–$2')
-
-    // RÈGLE : Guillemets ouvrants - Conversion du guillemet droit (") en guillemet français ouvrant («) suivi d'une espace fine insécable (\u202F)
-    .replace(/(^|\s)"\s*/g, '$1«\u202F')
-
-    // RÈGLE : Guillemets fermants - Conversion du guillemet droit restants (") en guillemet français fermant (») précédé d'une espace fine insécable (\u202F)
-    .replace(/\s*"/g, '\u202F»')
-
-    // RÈGLE : Sécurité guillemets existants (ouvrants) - Harmonisation de l'espace fine insécable (\u202F) après un guillemet français ouvrant préexistant
-    .replace(/(«)[\s\u00A0\u202F]?(.*?)/g, '$1\u202F$2')
-
-    // RÈGLE : Sécurité guillemets existants (fermants) - Harmonisation de l'espace fine insécable (\u202F) avant un guillemet français fermant préexistant
-    .replace(/[\s\u00A0\u202F]?(»)/g, '\u202F$1')
-
-    // RÈGLE : Ponctuation double (!, ?, ;) - Insertion ou correction d'une espace fine insécable (\u202F) directement devant le signe
-    .replace(/[\s\u00A0\u202F]?([!?;&])/g, '\u202F$1')
-
-    // RÈGLE : Deux-points (:) - Insertion ou correction d'une espace insécable standard (\u00A0) pour détacher visuellement ce signe haut
-    .replace(/[\s\u00A0\u202F]?(:)/g, '\u00A0$1');
-
-  return transforme;
-}
-
-/**
- * Script d'automatisation qui parcourt le DOM de la page
- */
-function appliquerTypographieAutomatique() {
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  let currentNode;
-
-  while (currentNode = walker.nextNode()) {
-    const parentNode = currentNode.parentNode;
-    if (!parentNode) continue;
-
-    const parentTag = parentNode.tagName;
-
-    // Éviter d'altérer le code, les styles ou les zones de saisie utilisateur
-    if (parentTag !== 'SCRIPT' && parentTag !== 'STYLE' && parentTag !== 'CODE' && parentTag !== 'TEXTAREA') {
-      
-      // Exclusion si l'élément (ou un parent) porte la classe 'no-typo'
-      if (parentNode.closest('.no-typo')) {
-        continue;
+      if (largeurFine === largeurInvalide || largeurFine === 0) {
+        return '\u00A0';
       }
-
-      // Application stricte si la langue de l'élément (ou d'un parent) commence par 'fr'
-      const elementAvecLangue = parentNode.closest('[lang]');
-      const langueDuContexte = elementAvecLangue ? elementAvecLangue.getAttribute('lang').toLowerCase() : '';
-      
-      if (langueDuContexte.startsWith('fr')) {
-        const estDansUnTableau = !!parentNode.closest('td');
-        currentNode.nodeValue = corrigerTypographieFrancaiseComplete(currentNode.nodeValue, estDansUnTableau);
-      }
+      return '\u202F';
+    } catch (e) {
+      return '\u00A0';
     }
   }
-}
 
-// Exécution au chargement complet du DOM
-document.addEventListener("DOMContentLoaded", appliquerTypographieAutomatique);
+  const ESPACE_FINE = verifierSupportEspaceFine();
+  const ESPACE_NBSP = '\u00A0';
+
+  // Liste des unités ISO et Impériales à lier au nombre qui les précède
+  const REGEX_UNITES = new RegExp(
+    '(?<=\\d)\\s*(' +
+    '°[CF]|' + // Températures
+    '(?:[kMGmcd])?(?:m|g|l|L|Wh|Hz|W|V|A|N|Pa|B)|t|hPa|dB|' + // ISO et préfixes
+    '(?:m|cm|mm)[²³]|' + // Surfaces et volumes
+    'in|ft|yd|mi|oz|lb|gal|qt|pt|mph' + // Impériales
+    ')(?=\\s|\\b|\\p{P}|$)', 'gu'
+  );
+
+  /**
+   * Application des règles typographiques sur un nœud de texte
+   */
+  function corrigerNoeudTexte(noeud) {
+    let texte = noeud.textContent;
+    if (!texte.trim()) return;
+
+    const parent = noeud.parentElement;
+    const estDansUnTableau = parent ? parent.closest('table') !== null : false;
+    const estDansTime = parent ? parent.closest('time') !== null : false;
+
+    // --- ISOLATION DES ADRESSES WEB ET COURRIELS ---
+    // Extrait temporairement les adresses Internet pour éviter d'y injecter des espaces
+    const REGEX_URL_PROTECTION = /(?:https?|ftp|mailto):\/\/[^\s]+|[a-z0-9]+([\-.][a-z0-9]+)*\.[a-z]{2,6}(?::\d{1,5})?\/?[^\s]*/gi;
+    const jetonsUrls = [];
+    
+    texte = texte.replace(REGEX_URL_PROTECTION, (match) => {
+      jetonsUrls.push(match);
+      return `__URL_TOKEN_${jetonsUrls.length - 1}__`;
+    });
+
+    // RÈGLE 1 : Apostrophes typographiques entre deux lettres
+    texte = texte.replace(/(?<=\p{L})[''](?=\p{L})/gu, '’');
+
+    // RÈGLE 2 : Deux-points (\u00A0 exigée) - Totalement sécurisé par le masquage des URLs
+    texte = texte.replace(/(?<=\S)\s*:(?!\/\d{2}\b)/gi, '\u00A0:');
+
+    // RÈGLE 3 : Ponctuation double (; ! ?) - Protégé contre les altérations de paramètres d'URL (?id=...)
+    texte = texte.replace(/\s*([;!?]+)/g, `${ESPACE_FINE}$1`);
+
+    // RÈGLE 4 : Guillemets français (« ») - Utilise une capture paresseuse sur une seule ligne
+    texte = texte.replace(/«\s*/g, `«${ESPACE_FINE}`);
+    texte = texte.replace(/\s*»/g, `${ESPACE_FINE}»`);
+    texte = texte.replace(/"([^"\n]*?)"/g, (match, contenu) => {
+      return `«${ESPACE_FINE}${contenu.trim()}${ESPACE_FINE}»`;
+    });
+
+    // RÈGLE 5 : Devises et Pourcentages
+    texte = texte.replace(/(?<=\d)\s*([$€£¥₣₩元])/g, `${ESPACE_FINE}$1`);
+    texte = texte.replace(/(?<=\d)\s*([%‰₱])/g, `${ESPACE_FINE}$1`);
+
+    // RÈGLE 6 : Unités de mesure physiques
+    REGEX_UNITES.lastIndex = 0;
+    texte = texte.replace(REGEX_UNITES, `${ESPACE_FINE}$1`);
+
+    // RÈGLE 7 : Tirets de dialogue et d'incise (\u00A0 exigée)
+    texte = texte.replace(/(^|\n)[ \t]*[-–—][ \t]*/g, '$1—\u00A0');
+    texte = texte.replace(/(?<=\p{L})\s+([-–—])\s+(?=\p{L})/gu, ' –\u00A0');
+
+    // RÈGLE 8 : Traitement spécifique pour la balise <time>
+    if (estDansTime) {
+      texte = texte.replace(/(?<=\d)\s*(h|min|s)(?=\s|\d|$)/gi, `${ESPACE_FINE}$1`);
+      texte = texte.replace(/(?<=(h|min))\s*(?=\d)/gi, ESPACE_FINE);
+      texte = texte.replace(/(?<=^|\s)(\d{1,2})\s+([a-zéû]+)\s+(\d{4})(?=$|\s)/gi, `$1${ESPACE_FINE}$2${ESPACE_FINE}$3`);
+      texte = texte.replace(/(?<=^|\s)(1er)\s+([a-zéû]+)\s+(\d{4})(?=$|\s)/gi, `$1${ESPACE_FINE}$2${ESPACE_FINE}$3`);
+    }
+
+    // RÈGLE 9 : Grands nombres (Séparateur de milliers)
+    texte = texte.replace(/\b-?\d+(?:[ \u00A0\u202F]\d{3})*(?:[.,]\d+)?\b/g, (nombreGlobal) => {
+      const signe = nombreGlobal.startsWith('-') ? '-' : '';
+      const corps = nombreGlobal.replace(/^-/, '');
+      const decimal = corps.match(/([.,]\d+)$/);
+      const partieDecimale = decimal ? decimal[0] : '';
+      let partieEntiere = decimal ? corps.slice(0, -partieDecimale.length) : corps;
+      partieEntiere = partieEntiere.replace(/[ \u00A0\u202F]/g, '');
+      const seuilAtteint = estDansUnTableau ? partieEntiere.length >= 4 : partieEntiere.length >= 5;
+
+      if (!seuilAtteint) return nombreGlobal;
+
+      const separateur = estDansUnTableau ? ESPACE_NBSP : ESPACE_FINE;
+      partieEntiere = partieEntiere.replace(/\B(?=(\d{3})+(?!\d))/g, separateur);
+      return signe + partieEntiere + partieDecimale;
+    });
+
+    // --- RESTAURATION DES ADRESSES WEB ---
+    if (jetonsUrls.length > 0) {
+      texte = texte.replace(/__URL_TOKEN_(\d+)__/g, (match, index) => {
+        return jetonsUrls[parseInt(index, 10)];
+      });
+    }
+
+    if (noeud.textContent !== texte) {
+      noeud.textContent = texte;
+    }
+  }
+
+  /**
+   * Vérifie si un élément parent est admissible
+   */
+  function validerElement(element) {
+    if (!element || element.nodeType !== Node.ELEMENT_NODE) return false;
+    if (BALISES_A_EXCLURE.includes(element.tagName)) return false;
+    if (element.closest(`.${CLASSE_A_EXCLURE}`) || element.closest('[data-typo="off"]')) return false;
+
+    const elementLangue = element.closest('[lang]');
+    if (elementLangue && !elementLangue.getAttribute('lang').toLowerCase().startsWith('fr')) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Parcours du DOM via TreeWalker
+   */
+  function corrigerTypographieFrancaise(racine) {
+    if (!racine) return;
+
+    if (racine.nodeType === Node.TEXT_NODE) {
+      if (racine.parentElement && validerElement(racine.parentElement)) {
+        corrigerNoeudTexte(racine);
+      }
+      return;
+    }
+
+    if (!validerElement(racine)) return;
+
+    const walker = document.createTreeWalker(
+      racine,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: function(noeud) {
+          const parent = noeud.parentElement;
+          if (!parent) return NodeFilter.FILTER_REJECT;
+          if (BALISES_A_EXCLURE.includes(parent.tagName)) return NodeFilter.FILTER_REJECT;
+          if (parent.closest(`.${CLASSE_A_EXCLURE}`) || parent.closest('[data-typo="off"]')) return NodeFilter.FILTER_REJECT;
+
+          const elementLangue = parent.closest('[lang]');
+          if (elementLangue && !elementLangue.getAttribute('lang').toLowerCase().startsWith('fr')) {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      }
+    );
+
+    const noeudsATraiter = [];
+    while (walker.nextNode()) {
+      noeudsATraiter.push(walker.currentNode);
+    }
+
+    noeudsATraiter.forEach(corrigerNoeudTexte);
+  }
+
+  /**
+   * Gestionnaire des mutations DOM surveillé
+   */
+  function traiterMutations(mutations) {
+    // Si la mutation provient des modifications du script lui-même, on l'ignore
+    if (estEnTrainDeCorriger) return;
+
+    try {
+      // Verrouillage actif pendant l'application des corrections
+      estEnTrainDeCorriger = true;
+
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((noeud) => {
+            corrigerTypographieFrancaise(noeud);
+          });
+        } else if (mutation.type === 'characterData' && mutation.target.parentElement) {
+          corrigerTypographieFrancaise(mutation.target);
+        }
+      });
+    } finally {
+      // Libération systématique du verrou mécanique (même en cas d'erreur logicielle)
+      estEnTrainDeCorriger = false;
+    }
+  }
+
+  function lancerSurveillance() {
+    if (!observateurDynamique) return;
+    observateurDynamique.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+
+  function démarrer() {
+    corrigerTypographieFrancaise(document.body);
+    observateurDynamique = new MutationObserver(traiterMutations);
+    lancerSurveillance();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', démarrer);
+  } else {
+    démarrer();
+  }
+})();
