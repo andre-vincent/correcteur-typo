@@ -1,5 +1,5 @@
 /** JAVASCRIPT
- * Correcteur typographique pour la langue française v10.2
+ * Correcteur typographique pour la langue française v4.0
  * Conforme aux normes de l'Imprimerie nationale (FR) et de l'OQLF (CA).
  * 
  * Optimisé avec document.createTreeWalker et NodeFilter.
