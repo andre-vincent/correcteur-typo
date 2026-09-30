@@ -114,7 +114,7 @@ function enrichirStructureSemantique(htmlText) {
     // RÈGLE : Chiffres arabes ordinaux - Suffixe (er, re, e, ers, res) enveloppé dans <sup> (exposant)
     .replace(/\b(\d+)(er|re|e|ers|res)\b/g, '$1<sup>$2</sup>')
 
-    // CORRECTION APPLIQUÉE RÈGLE CIVILITÉS PLURIELLES : Englobe de manière étanche le "s" final dans la balise SUP
+    // CORRECTION ARCHITECTURE DES CIVILITÉS : Capture de l'intégralité sémantique du suffixe pour une inclusion hermétique dans SUP
     .replace(/\bM(mes)\b/g, 'M<sup>$1</sup>')
     .replace(/\bM(me)\b/g, 'M<sup>$1</sup>')
     .replace(/\bM(lles)\b/g, 'M<sup>$1</sup>')
