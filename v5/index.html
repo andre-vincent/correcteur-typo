@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Banc d'essai et laboratoire de validation pour le correcteur ortho-typographique français v5. Vérification de la conformité aux normes de l'Imprimerie Nationale.">
-  <title>Banc d'essai - Correcteur ortho-typographique v5</title>
+  <meta name="description" content="Banc d'essai et laboratoire de validation pour le correcteur ortho-typographique français v5.3. Vérification de la conformité des singuliers et pluriels aux normes de l'Imprimerie Nationale.">
+  <title>Banc d'essai - Correcteur ortho-typographique v5.3</title>
   <style>
     /* --- Base & Typographie Classless (Contraste Élevé WCAG AA) --- */
     :root {
@@ -33,6 +33,23 @@
     header p, footer p {
       margin: 0.5rem 0 0 0;
       opacity: 0.9;
+    }
+    
+    /* --- Intégration Écoindex (Sémantique & Centrée) --- */
+    footer a {
+      display: inline-block;
+      margin-top: 1.5rem;
+      transition: transform 0.2s ease-in-out;
+    }
+    footer a:hover {
+      transform: scale(1.02);
+    }
+    footer img {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      height: auto;
+      border: none;
     }
 
     /* --- Grid Layout Adaptatif (Responsive) --- */
@@ -107,7 +124,7 @@
       text-align: center;
     }
 
-    /* --- Règles Sémantiques v5 : Petites Capitales et Exposants --- */
+    /* --- Règles Sémantiques v5.3 : Petites Capitales et Exposants --- */
     abbr {
       font-variant: small-caps;
       letter-spacing: 0.05em;
@@ -125,8 +142,8 @@
 <body>
 
   <header>
-    <h1>Laboratoire de validation typographique — Version 5</h1>
-    <p>Démonstration interactive enrichie (Petites capitales, Exposants et Micro-mise en page sémantique)</p>
+    <h1>Laboratoire de validation typographique — Version 5.3</h1>
+    <p>Démonstration interactive (Prise en charge complète des formes singulières et plurielles)</p>
   </header>
 
   <main>
@@ -230,7 +247,7 @@
       </section>
     </article>
 
-    <!-- Règle 11 (Nouvelle v5) -->
+    <!-- Règle 11 -->
     <article>
       <h2>11. Les sigles (Petites capitales)</h2>
       <p>Toute suite de 2 majuscules consécutives ou plus est entourée de la balise ABBR pour basculer en petites capitales harmonieuses.</p>
@@ -240,44 +257,49 @@
       </section>
     </article>
 
-    <!-- Règle 12 (Nouvelle v5) -->
+    <!-- Règle 12 -->
     <article>
       <h2>12. Les siècles en chiffres romains</h2>
-      <p>Les siècles en chiffres romains passent en petites capitales (ABBR) tandis que leur suffixe ordinal passe en exposant (SUP).</p>
+      <p>Les siècles en chiffres romains passent en petites capitales (ABBR) tandis que leur suffixe ordinal singulier ou pluriel passe en exposant (SUP).</p>
       <section>
-        <p class="no-typo">Nous vivons au XXIe siècle, juste après le XXe siècle et le Ier siècle.</p>
-        <p>Nous vivons au XXIe siècle, juste après le XXe siècle et le Ier siècle.</p>
+        <p class="no-typo">Nous étudions les XXe et XXIes siècles, juste après le Ier siècle.</p>
+        <p>Nous étudions les XXe et XXIes siècles, juste après le Ier siècle.</p>
       </section>
     </article>
 
-    <!-- Règle 13 (Nouvelle v5) -->
+    <!-- Règle 13 -->
     <article>
       <h2>13. Les ordinaux en chiffres arabes</h2>
       <p>Les terminaisons des abréviations ordinales en chiffres arabes (er, re, e, ers, res) sont automatiquement placées en exposant (SUP).</p>
       <section>
-        <p class="no-typo">Habiter au 1er étage du 2e bâtiment de la 3e avenue.</p>
-        <p>Habiter au 1er étage du 2e bâtiment de la 3e avenue.</p>
+        <p class="no-typo">Habiter au 1er étage du 2e bâtiment des 3es subdivisions.</p>
+        <p>Habiter au 1er étage du 2e bâtiment des 3es subdivisions.</p>
       </section>
     </article>
 
-    <!-- Règle 14 (Nouvelle v5) -->
+    <!-- Règle 14 -->
     <article>
-      <h2>14. Contraction des civilités</h2>
-      <p>Les suffixes des abréviations de civilités contractées (me, lle, e, gr) passent en exposant (SUP). M. et Dr restent bas.</p>
+      <h2>14. Contraction des civilités (Singulier & Pluriel)</h2>
+      <p>Les suffixes des abréviations de civilités contractées au singulier (me, lle, e) et au pluriel (mes, lles, es) passent en exposant (SUP).</p>
       <section>
-        <p class="no-typo">Mme Martin, Mlle Julie et Me Dupont saluent le Dr Evans.</p>
-        <p>Mme Martin, Mlle Julie et Me Dupont saluent le Dr Evans.</p>
+        <p class="no-typo">Mmes Martin et Roy, Mlles Julie et Lucie, Mes Dupont et Simon saluent les Drs Evans et Jones.</p>
+        <p>Mmes Martin et Roy, Mlles Julie et Lucie, Mes Dupont et Simon saluent les Drs Evans et Jones.</p>
       </section>
     </article>
   </main>
 
   <footer>
-    <p>Banc d'essai v5 généré automatiquement — Conforme aux directives de l'Imprimerie Nationale.</p>
+    <p>Banc d'essai v5.3 généré automatiquement — Conforme aux directives de l'Imprimerie Nationale.</p>
+    
+    <!-- Conteneur structurel dynamique pour le badge Écoindex -->
     <div id="ecoindex-badge"></div>
-<script src="https://cdn.jsdelivr.net/gh/cnumr/ecoindex_badge@3/assets/js/ecoindex-badge.js" defer></script>
   </footer>
 
-  <!-- Lien vers le script de traitement externe -->
+  <!-- Chargement asynchrone sécurisé du badge d'analyse environnementale Écoindex -->
+  <script src="https://cdn.jsdelivr.net/gh/cnumr/ecoindex_badge@3/assets/js/ecoindex-badge.js" defer></script>
+  
+  <!-- Lien vers le script de traitement typographique externe -->
   <script src="typo-fr.js"></script>
 </body>
 </html>
+  
