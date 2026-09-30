@@ -1,4 +1,4 @@
-/* Correcteur ortho-typographique pour la langue française - Version 5.3 */
+/* Correcteur ortho-typographique pour la langue française - Version 5.6 */
 
 /**
  * Formate les nombres selon les règles de l'Imprimerie Nationale
@@ -20,6 +20,29 @@ function formaterNombresFrancais(text, estDansUnTableau = false) {
 }
 
 /**
+ * Applique les ligatures typographiques françaises strictes (œ, æ)
+ * @param {string} text - Le texte brut à analyser
+ * @returns {string} - Le texte avec les ligatures appliquées
+ */
+function appliquerLigaturesFrancaises(text) {
+  return text
+    // LIGATURES Œ (Minuscules) : racines courantes (cœur, œil, œuf, œuvr, œstr, œdi, fœt, bœuf, vœu, sœu, chœu, mœu)
+    .replace(/c(oe)u/g, 'cœu').replace(/([fF])(oe)t/g, '$1œt').replace(/([bB])(oe)u/g, '$1œu')
+    .replace(/([vV])(oe)u/g, '$1œu').replace(/([sS])(oe)u/g, '$1œu').replace(/ch(oe)u/g, 'chœu')
+    .replace(/m(oe)u/g, 'mœu').replace(/([oO])(ee)i/g, 'œi').replace(/([oO])(ee)u/g, 'œu')
+    // LIGATURES Œ (Majuscules)
+    .replace(/C(OE)U/g, 'CŒU').replace(/([fF])(OE)t/g, '$1Œt').replace(/([bB])(OE)U/g, '$1ŒU')
+    .replace(/([vV])(OE)U/g, '$1ŒU').replace(/([sS])(OE)U/g, '$1ŒU').replace(/CH(OE)U/g, 'CHŒU')
+    .replace(/M(OE)U/g, 'MŒU').replace(/([oO])(EE)I/g, 'ŒI').replace(/([oO])(EE)U/g, 'ŒU')
+    
+    // LIGATURES Æ : racines courantes (aequo, caecum, naevus, praesidium, curriculum vitae [non traité car latin, mais ae inclus])
+    .replace(/([aA])(ee)qu/g, 'æqu').replace(/c(ae)c/g, 'cæc').replace(/n(ae)v/g, 'næv')
+    .replace(/pr(ae)s/g, 'præs').replace(/t(ae)n/g, 'tæn')
+    .replace(/([aA])(EE)QU/g, 'ÆQU').replace(/C(AE)C/g, 'CÆC').replace(/N(AE)V/g, 'NÆV')
+    .replace(/PR(AE)S/g, 'PRÆS').replace(/T(AE)N/g, 'TÆN');
+}
+
+/**
  * Fonction globale de correction des caractères et des espaces
  */
 function corrigerTypographieFrancaiseComplete(text, estDansUnTableau = false) {
@@ -32,7 +55,13 @@ function corrigerTypographieFrancaiseComplete(text, estDansUnTableau = false) {
   // RÈGLE : Espacement des milliers par blocs de 3 (espace fine insécable \u202F)
   transforme = formaterNombresFrancais(transforme, estDansUnTableau);
 
+  // RÈGLE : Application des ligatures sémantiques françaises (œ, æ)
+  transforme = appliquerLigaturesFrancaises(transforme);
+
   transforme = transforme
+    // RÈGLE : Remplacement automatique des trois points successifs par le glyphe officiel de points de suspension (…)
+    .replace(/\.{3}/g, '…')
+
     // RÈGLE : Devises et symboles (€, $, %, etc.) précédés d'une espace fine insécable (\u202F)
     .replace(/(\d)[\s\u00A0\u202F]?([€$£¥%‰])/g, '$1\u202F$2')
 
@@ -40,7 +69,6 @@ function corrigerTypographieFrancaiseComplete(text, estDansUnTableau = false) {
     .replace(/(\d)[\s\u00A0\u202F]?(m|cm|mm|km|g|kg|t|L|ml|km\/h|kg\/h|°C|°F|Hz|W|kW|Wh|kWh)\b/g, '$1\u202F$2')
 
     // RÈGLE : Abréviations de civilité et titres (M., Mme, etc.) suivis d'une espace insécable standard (\u00A0)
-    // Prise en charge des pluriels (Mmes, Mlles, Drs, Mes, Mgrs) dans la détection des espacements
     .replace(/\b(M\.|Mme|Mmes|Mlle|Mlles|Dr|Drs|Me|Mes|Mgr|Mgrs|Cie|Cies)[\s\u00A0\u202F]?(\p{L})/gu, '$1\u00A0$2')
 
     // RÈGLE : Dialogues - Conversion des tirets simples/doubles en début de ligne par un tiret cadratin (—) + espace insécable standard (\u00A0)
@@ -81,17 +109,20 @@ function corrigerTypographieFrancaiseComplete(text, estDansUnTableau = false) {
 function enrichirStructureSemantique(htmlText) {
   return htmlText
     // RÈGLE : Siècles en chiffres romains - Chiffre dans <abbr> (petites capitales) et suffixe dans <sup> (exposant)
-    // Supporte également les formes plurielles (ex: XXIes)
-    .replace(/\b([IVXLCDM]+)(er|e|es)\b/g, '<abbr>$1</abbr><sup>$2</sup>')
+    .replace(/\b([IVXLCDM]+)(er|es|e)\b/g, '<abbr>$1</abbr><sup>$2</sup>')
     
     // RÈGLE : Chiffres arabes ordinaux - Suffixe (er, re, e, ers, res) enveloppé dans <sup> (exposant)
     .replace(/\b(\d+)(er|re|e|ers|res)\b/g, '$1<sup>$2</sup>')
 
-    // RÈGLE : Abréviations de civilité contractées singulières et plurielles - Met l'ensemble du suffixe final (me, mes, lle, lles, e, es, gr, grs) en exposant via <sup>
-    .replace(/\b(M)(mes|me)\b/g, '$1<sup>$2</sup>')
-    .replace(/\b(M)(lles|lle)\b/g, '$1<sup>$2</sup>')
-    .replace(/\b(M)(es|e)\b/g, '$1<sup>$2</sup>')
-    .replace(/\b(M)(grs|gr)\b/g, '$1<sup>$2</sup>')
+    // RÈGLE CIVILITÉS : Ciblage strict du "M" initial pour éviter de formater des mots génériques comme "le" ou "les"
+    .replace(/\bM(mes)\b/g, 'M<sup>$1</sup>')
+    .replace(/\bM(me)\b/g, 'M<sup>$1</sup>')
+    .replace(/\bM(lles)\b/g, 'M<sup>$1</sup>')
+    .replace(/\bM(lle)\b/g, 'M<sup>$1</sup>')
+    .replace(/\bM(es)\b/g, 'M<sup>$1</sup>')
+    .replace(/\bM(e)\b/g, 'M<sup>$1</sup>')
+    .replace(/\bM(grs)\b/g, 'M<sup>$1</sup>')
+    .replace(/\bM(gr)\b/g, 'M<sup>$1</sup>')
     
     // RÈGLE : Détection de 2 majuscules consécutives ou plus (sigles/acronymes) pour mise en petites capitales
     .replace(/\b(\p{Lu}{2,})\b/gu, '<abbr>$1</abbr>');
