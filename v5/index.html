@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Banc d'essai et laboratoire de validation pour le correcteur ortho-typographique français v5.3. Vérification de la conformité des singuliers et pluriels aux normes de l'Imprimerie Nationale.">
-  <title>Banc d'essai - Correcteur ortho-typographique v5.3</title>
+  <meta name="description" content="Banc d'essai et laboratoire de validation pour le correcteur ortho-typographique français v5.6. Vérification de la conformité des ligatures, pluriels et ellipses aux normes de l'Imprimerie Nationale.">
+  <title>Banc d'essai - Correcteur ortho-typographique v5.6</title>
   <style>
     /* --- Base & Typographie Classless (Contraste Élevé WCAG AA) --- */
     :root {
@@ -35,21 +35,9 @@
       opacity: 0.9;
     }
     
-    /* --- Intégration Écoindex (Sémantique & Centrée) --- */
-    footer a {
-      display: inline-block;
+    /* --- Intégration Écoindex --- */
+    footer div#ecoindex-badge {
       margin-top: 1.5rem;
-      transition: transform 0.2s ease-in-out;
-    }
-    footer a:hover {
-      transform: scale(1.02);
-    }
-    footer img {
-      display: block;
-      margin: 0 auto;
-      max-width: 100%;
-      height: auto;
-      border: none;
     }
 
     /* --- Grid Layout Adaptatif (Responsive) --- */
@@ -124,7 +112,7 @@
       text-align: center;
     }
 
-    /* --- Règles Sémantiques v5.3 : Petites Capitales et Exposants --- */
+    /* --- Règles Sémantiques v5.6 : Petites Capitales et Exposants --- */
     abbr {
       font-variant: small-caps;
       letter-spacing: 0.05em;
@@ -142,8 +130,8 @@
 <body>
 
   <header>
-    <h1>Laboratoire de validation typographique — Version 5.3</h1>
-    <p>Démonstration interactive (Prise en charge complète des formes singulières et plurielles)</p>
+    <h1>Laboratoire de validation typographique — Version 5.6</h1>
+    <p>Démonstration interactive (Ligatures œ/æ, Ellipses, Formes singulières et plurielles)</p>
   </header>
 
   <main>
@@ -226,7 +214,6 @@
         <p>Cette règle - dit-il - est essentielle pour la mise en page.</p>
       </section>
     </article>
-
     <!-- Règle 9 -->
     <article>
       <h2>9. Les guillemets</h2>
@@ -286,20 +273,39 @@
         <p>Mmes Martin et Roy, Mlles Julie et Lucie, Mes Dupont et Simon saluent les Drs Evans et Jones.</p>
       </section>
     </article>
+
+    <!-- Règle 15 (Nouvelle v5.6) -->
+    <article>
+      <h2>15. Les points de suspension</h2>
+      <p>Les suites de trois points consécutifs (...) sont converties de manière sémantique en un caractère d'ellipse unique (…).</p>
+      <section>
+        <p class="no-typo">Attendre la suite des événements... C'est mystérieux...</p>
+        <p>Attendre la suite des événements... C'est mystérieux...</p>
+      </section>
+    </article>
+
+    <!-- Règle 16 (Nouvelle v5.6) -->
+    <article>
+      <h2>16. Les ligatures typographiques (œ, æ)</h2>
+      <p>Les paires de lettres correspondantes sont soudées en ligatures officielles d'après un dictionnaire strict (cœur, œil, ex aequo).</p>
+      <section>
+        <p class="no-typo">Son coeur bat à l'ouverture de son oeil, ils sont ex aequo.</p>
+        <p>Son coeur bat à l'ouverture de son oeil, ils sont ex aequo.</p>
+      </section>
+    </article>
   </main>
 
   <footer>
-    <p>Banc d'essai v5.3 généré automatiquement — Conforme aux directives de l'Imprimerie Nationale.</p>
+    <p>Banc d'essai v5.6 généré automatiquement — Conforme aux directives de l'Imprimerie Nationale.</p>
     
     <!-- Conteneur structurel dynamique pour le badge Écoindex -->
     <div id="ecoindex-badge"></div>
   </footer>
 
   <!-- Chargement asynchrone sécurisé du badge d'analyse environnementale Écoindex -->
-  <script src="https://cdn.jsdelivr.net/gh/cnumr/ecoindex_badge@3/assets/js/ecoindex-badge.js" defer></script>
+  <script src="https://jsdelivr.net" defer></script>
   
   <!-- Lien vers le script de traitement typographique externe -->
   <script src="typo-fr.js"></script>
 </body>
 </html>
-  
