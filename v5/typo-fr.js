@@ -1,4 +1,4 @@
-/* Correcteur ortho-typographique pour la langue française - Version 5.6 */
+/* Correcteur ortho-typographique pour la langue française - Version 5.7 */
 
 /**
  * Formate les nombres selon les règles de l'Imprimerie Nationale
@@ -26,7 +26,7 @@ function formaterNombresFrancais(text, estDansUnTableau = false) {
  */
 function appliquerLigaturesFrancaises(text) {
   return text
-    // LIGATURES Œ (Minuscules) : racines courantes (cœur, œil, œuf, œuvr, œstr, œdi, fœt, bœuf, vœu, sœu, chœu, mœu)
+    // LIGATURES Œ (Minuscules)
     .replace(/c(oe)u/g, 'cœu').replace(/([fF])(oe)t/g, '$1œt').replace(/([bB])(oe)u/g, '$1œu')
     .replace(/([vV])(oe)u/g, '$1œu').replace(/([sS])(oe)u/g, '$1œu').replace(/ch(oe)u/g, 'chœu')
     .replace(/m(oe)u/g, 'mœu').replace(/oei/g, 'œi').replace(/oeu/g, 'œu')
@@ -35,7 +35,7 @@ function appliquerLigaturesFrancaises(text) {
     .replace(/([vV])(OE)U/g, '$1ŒU').replace(/([sS])(OE)U/g, '$1ŒU').replace(/CH(OE)U/g, 'CHŒU')
     .replace(/M(OE)U/g, 'MŒU').replace(/OEI/g, 'ŒI').replace(/OEU/g, 'ŒU')
     
-    // LIGATURES Æ : racines courantes (aequo, caecum, naevus, praesidium, etc.)
+    // LIGATURES Æ
     .replace(/aequ/g, 'æqu').replace(/c(ae)c/g, 'cæc').replace(/n(ae)v/g, 'næv')
     .replace(/pr(ae)s/g, 'præs').replace(/t(ae)n/g, 'tæn')
     .replace(/AEQU/g, 'ÆQU').replace(/C(AE)C/g, 'CÆC').replace(/N(AE)V/g, 'NÆV')
@@ -108,13 +108,13 @@ function corrigerTypographieFrancaiseComplete(text, estDansUnTableau = false) {
  */
 function enrichirStructureSemantique(htmlText) {
   return htmlText
-    // RÈGLE : Siècles en chiffres romains - Chiffre dans <abbr> (petites capitales) et suffixe dans <sup> (exposant)
-    .replace(/\b([IVXLCDM]+)(er|es|e)\b/g, '<abbr>$1</abbr><sup>$2</sup>')
+    // RÈGLE SÉCURISÉE SIÈCLES : Capture les chiffres romains mais EXCLUT formellement le mot "Le" ou "Les" (L seul suivi de e/es)
+    .replace(/\b(?![lL](?:es|e)\b)([IVXLCDM]+)(er|es|e)\b/g, '<abbr>$1</abbr><sup>$2</sup>')
     
     // RÈGLE : Chiffres arabes ordinaux - Suffixe (er, re, e, ers, res) enveloppé dans <sup> (exposant)
     .replace(/\b(\d+)(er|re|e|ers|res)\b/g, '$1<sup>$2</sup>')
 
-    // CORRECTION ULTRA-STRICTE CIVILITÉS : Verrouille la lettre M en début de mot pour empêcher la transformation de "le" ou "les"
+    // RÈGLE SÉCURISÉE CIVILITÉS : Se déclenche exclusivement sur le M initial des civilités suivies de leurs suffixes stricts
     .replace(/\bM(mes)\b/g, 'M<sup>$1</sup>')
     .replace(/\bM(me)\b/g, 'M<sup>$1</sup>')
     .replace(/\bM(lles)\b/g, 'M<sup>$1</sup>')
