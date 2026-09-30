@@ -1,4 +1,4 @@
-/* Correcteur ortho-typographique pour la langue française - Version 5.8 */
+/* Correcteur ortho-typographique pour la langue française - Version 6 */
 
 /**
  * Formate les nombres selon les règles de l'Imprimerie Nationale
@@ -108,19 +108,19 @@ function corrigerTypographieFrancaiseComplete(text, estDansUnTableau = false) {
  */
 function enrichirStructureSemantique(htmlText) {
   return htmlText
-    // RÈGLE SÉCURISÉE SIÈCLES : Capture les chiffres romains mais EXCLUT formellement le mot "Le" ou "Les" (L seul suivi de e/es)
-    .replace(/\b(?![lL](?:es|e)\b)([IVXLCDM]+)(er|es|e)\b/g, '<abbr>$1</abbr><sup>$2</sup>')
+    // RÈGLE SÉCURISÉE SIÈCLES : Bloque explicitement les mots grammaticaux français de 2/3 lettres mimant les chiffres romains (Le, Les, Mes, Des, Ces, Ses)
+    .replace(/\b(?!(?:[lLmMdDcC][eE]s?)\b)([IVXLCDM]+)(er|es|e)\b/g, '<abbr>$1</abbr><sup>$2</sup>')
     
     // RÈGLE : Chiffres arabes ordinaux - Suffixe (er, re, e, ers, res) enveloppé dans <sup> (exposant)
     .replace(/\b(\d+)(er|re|e|ers|res)\b/g, '$1<sup>$2</sup>')
 
-    // CORRECTION ARCHITECTURE DES CIVILITÉS : Capture de l'intégralité sémantique du suffixe pour une inclusion hermétique dans SUP
+    // RÈGLE SÉCURISÉE CIVILITÉS : Extraction étanche et rigoureuse rattachée uniquement au M initial
     .replace(/\bM(mes)\b/g, 'M<sup>$1</sup>')
     .replace(/\bM(me)\b/g, 'M<sup>$1</sup>')
     .replace(/\bM(lles)\b/g, 'M<sup>$1</sup>')
     .replace(/\bM(lle)\b/g, 'M<sup>$1</sup>')
     .replace(/\bM(es)\b/g, 'M<sup>$1</sup>')
-    .replace(/\bM(e)\b/g, 'M<sup>$1</sup>')
+    .replace(/\bM(e)\b/g, 'M['.replace(' warm', '') + '<sup>$1</sup>')
     .replace(/\bM(grs)\b/g, 'M<sup>$1</sup>')
     .replace(/\bM(gr)\b/g, 'M<sup>$1</sup>')
     
