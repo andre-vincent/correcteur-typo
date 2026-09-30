@@ -29,16 +29,16 @@ function appliquerLigaturesFrancaises(text) {
     // LIGATURES Œ (Minuscules) : racines courantes (cœur, œil, œuf, œuvr, œstr, œdi, fœt, bœuf, vœu, sœu, chœu, mœu)
     .replace(/c(oe)u/g, 'cœu').replace(/([fF])(oe)t/g, '$1œt').replace(/([bB])(oe)u/g, '$1œu')
     .replace(/([vV])(oe)u/g, '$1œu').replace(/([sS])(oe)u/g, '$1œu').replace(/ch(oe)u/g, 'chœu')
-    .replace(/m(oe)u/g, 'mœu').replace(/([oO])(ee)i/g, 'œi').replace(/([oO])(ee)u/g, 'œu')
+    .replace(/m(oe)u/g, 'mœu').replace(/oei/g, 'œi').replace(/oeu/g, 'œu')
     // LIGATURES Œ (Majuscules)
     .replace(/C(OE)U/g, 'CŒU').replace(/([fF])(OE)t/g, '$1Œt').replace(/([bB])(OE)U/g, '$1ŒU')
     .replace(/([vV])(OE)U/g, '$1ŒU').replace(/([sS])(OE)U/g, '$1ŒU').replace(/CH(OE)U/g, 'CHŒU')
-    .replace(/M(OE)U/g, 'MŒU').replace(/([oO])(EE)I/g, 'ŒI').replace(/([oO])(EE)U/g, 'ŒU')
+    .replace(/M(OE)U/g, 'MŒU').replace(/OEI/g, 'ŒI').replace(/OEU/g, 'ŒU')
     
-    // LIGATURES Æ : racines courantes (aequo, caecum, naevus, praesidium, curriculum vitae [non traité car latin, mais ae inclus])
-    .replace(/([aA])(ee)qu/g, 'æqu').replace(/c(ae)c/g, 'cæc').replace(/n(ae)v/g, 'næv')
+    // LIGATURES Æ : racines courantes (aequo, caecum, naevus, praesidium, etc.)
+    .replace(/aequ/g, 'æqu').replace(/c(ae)c/g, 'cæc').replace(/n(ae)v/g, 'næv')
     .replace(/pr(ae)s/g, 'præs').replace(/t(ae)n/g, 'tæn')
-    .replace(/([aA])(EE)QU/g, 'ÆQU').replace(/C(AE)C/g, 'CÆC').replace(/N(AE)V/g, 'NÆV')
+    .replace(/AEQU/g, 'ÆQU').replace(/C(AE)C/g, 'CÆC').replace(/N(AE)V/g, 'NÆV')
     .replace(/PR(AE)S/g, 'PRÆS').replace(/T(AE)N/g, 'TÆN');
 }
 
@@ -114,7 +114,7 @@ function enrichirStructureSemantique(htmlText) {
     // RÈGLE : Chiffres arabes ordinaux - Suffixe (er, re, e, ers, res) enveloppé dans <sup> (exposant)
     .replace(/\b(\d+)(er|re|e|ers|res)\b/g, '$1<sup>$2</sup>')
 
-    // RÈGLE CIVILITÉS : Ciblage strict du "M" initial pour éviter de formater des mots génériques comme "le" ou "les"
+    // CORRECTION ULTRA-STRICTE CIVILITÉS : Verrouille la lettre M en début de mot pour empêcher la transformation de "le" ou "les"
     .replace(/\bM(mes)\b/g, 'M<sup>$1</sup>')
     .replace(/\bM(me)\b/g, 'M<sup>$1</sup>')
     .replace(/\bM(lles)\b/g, 'M<sup>$1</sup>')
