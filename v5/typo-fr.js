@@ -1,7 +1,10 @@
-/* Correcteur ortho-typographique pour la langue française - Version 5 */
+/* Correcteur ortho-typographique pour la langue française - Version 5.3 */
 
 /**
  * Formate les nombres selon les règles de l'Imprimerie Nationale
+ * @param {string} text - Le texte brut à analyser
+ * @param {boolean} estDansUnTableau - Si vrai, formate dès 4 chiffres. Si faux, dès 5 chiffres.
+ * @returns {string} - Le texte avec les espaces fines insécables
  */
 function formaterNombresFrancais(text, estDansUnTableau = false) {
   return text.replace(/\b\d+(?:\s\d+)*\b/g, (match) => {
@@ -37,7 +40,8 @@ function corrigerTypographieFrancaiseComplete(text, estDansUnTableau = false) {
     .replace(/(\d)[\s\u00A0\u202F]?(m|cm|mm|km|g|kg|t|L|ml|km\/h|kg\/h|°C|°F|Hz|W|kW|Wh|kWh)\b/g, '$1\u202F$2')
 
     // RÈGLE : Abréviations de civilité et titres (M., Mme, etc.) suivis d'une espace insécable standard (\u00A0)
-    .replace(/\b(M\.|Mme|Mlle|Dr|Me|Mgr|Cie)[\s\u00A0\u202F]?(\p{L})/gu, '$1\u00A0$2')
+    // Prise en charge des pluriels (Mmes, Mlles, Drs, Mes, Mgrs) dans la détection des espacements
+    .replace(/\b(M\.|Mme|Mmes|Mlle|Mlles|Dr|Drs|Me|Mes|Mgr|Mgrs|Cie|Cies)[\s\u00A0\u202F]?(\p{L})/gu, '$1\u00A0$2')
 
     // RÈGLE : Dialogues - Conversion des tirets simples/doubles en début de ligne par un tiret cadratin (—) + espace insécable standard (\u00A0)
     .replace(/^(?:--|-|—)\s*/gm, '—\u00A0')
@@ -77,16 +81,17 @@ function corrigerTypographieFrancaiseComplete(text, estDansUnTableau = false) {
 function enrichirStructureSemantique(htmlText) {
   return htmlText
     // RÈGLE : Siècles en chiffres romains - Chiffre dans <abbr> (petites capitales) et suffixe dans <sup> (exposant)
-    .replace(/\b([IVXLCDM]+)(er|e)\b/g, '<abbr>$1</abbr><sup>$2</sup>')
+    // Supporte également les formes plurielles (ex: XXIes)
+    .replace(/\b([IVXLCDM]+)(er|e|es)\b/g, '<abbr>$1</abbr><sup>$2</sup>')
     
     // RÈGLE : Chiffres arabes ordinaux - Suffixe (er, re, e, ers, res) enveloppé dans <sup> (exposant)
     .replace(/\b(\d+)(er|re|e|ers|res)\b/g, '$1<sup>$2</sup>')
 
-    // RÈGLE : Abréviations de civilité contractées - Met la terminaison (me, lle, e, gr) en exposant via <sup>
-    .replace(/\b(Mm)(e)\b/g, '$1<sup>$2</sup>')
-    .replace(/\b(Mll)(e)\b/g, '$1<sup>$2</sup>')
-    .replace(/\b(M)(e)\b/g, '$1<sup>$2</sup>')
-    .replace(/\b(Mg)(r)\b/g, '$1<sup>$2</sup>')
+    // RÈGLE : Abréviations de civilité contractées singulières et plurielles - Met l'ensemble du suffixe final (me, mes, lle, lles, e, es, gr, grs) en exposant via <sup>
+    .replace(/\b(M)(mes|me)\b/g, '$1<sup>$2</sup>')
+    .replace(/\b(M)(lles|lle)\b/g, '$1<sup>$2</sup>')
+    .replace(/\b(M)(es|e)\b/g, '$1<sup>$2</sup>')
+    .replace(/\b(M)(grs|gr)\b/g, '$1<sup>$2</sup>')
     
     // RÈGLE : Détection de 2 majuscules consécutives ou plus (sigles/acronymes) pour mise en petites capitales
     .replace(/\b(\p{Lu}{2,})\b/gu, '<abbr>$1</abbr>');
