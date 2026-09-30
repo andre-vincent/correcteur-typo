@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Banc d'essai et laboratoire de validation pour le correcteur ortho-typographique français v5. Vérification de la conformité aux normes de l'Imprimerie Nationale.">
+  <title>Banc d'essai - Correcteur ortho-typographique v5</title>
+  <style>
+    /* --- Base & Typographie Classless (Contraste Élevé WCAG AA) --- */
+    :root {
+      --bg-color: #fcfcfd;
+      --card-bg: #ffffff;
+      --text-color: #1a202c; /* Contraste > 4.5:1 sur fond blanc */
+      --accent-color: #2d3748; /* Contraste > 4.5:1 sur fond blanc */
+      --border-color: #cbd5e0;
+      --text-light: #ffffff;
+      --muted-text: #4a5568; /* Contraste > 4.5:1 sur fond #f7fafc */
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 0;
+    }
+    header, footer {
+      background-color: var(--accent-color);
+      color: var(--text-light);
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    header p, footer p {
+      margin: 0.5rem 0 0 0;
+      opacity: 0.9;
+    }
+
+    /* --- Grid Layout Adaptatif (Responsive) --- */
+    main {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+      gap: 2rem;
+      max-width: 75rem;
+      margin: 3rem auto;
+      padding: 0 1rem;
+    }
+
+    /* --- Structure des Articles (Cards) --- */
+    article {
+      background: var(--card-bg);
+      border: 0.0625rem solid var(--border-color);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0.25rem 0.375rem -0.0625rem rgba(0, 0, 0, 0.05);
+    }
+    h1 {
+      font-size: 2.25rem;
+      margin: 0;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 1.35rem;
+      color: var(--text-color);
+      border-bottom: 0.125rem solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+    article > p {
+      font-size: 0.95rem;
+      color: var(--muted-text);
+      flex-grow: 1;
+    }
+
+    /* --- Sections de Comparaison --- */
+    section {
+      background: #f7fafc;
+      border-left: 0.25rem solid var(--accent-color);
+      padding: 0.75rem 1rem;
+      margin-top: 1rem;
+      border-radius: 0 0.25rem 0.25rem 0;
+    }
+    section p {
+      margin: 0.5rem 0;
+      font-size: 1rem;
+    }
+    section p:first-of-type::before {
+      content: "❌ Avant : ";
+      font-weight: bold;
+      color: #c53030; /* Rouge accessible AA */
+    }
+    section p:last-of-type::before {
+      content: "✅ Après : ";
+      font-weight: bold;
+      color: #22543d; /* Vert accessible AA */
+    }
+    
+    /* --- Tableaux (Cas particuliers) --- */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+    }
+    td {
+      border: 0.0625rem solid var(--border-color);
+      padding: 0.5rem;
+      text-align: center;
+    }
+
+    /* --- Règles Sémantiques v5 : Petites Capitales et Exposants --- */
+    abbr {
+      font-variant: small-caps;
+      letter-spacing: 0.05em;
+      text-decoration: none; 
+    }
+    sup {
+      font-size: 0.75em;
+      line-height: 0;
+      position: relative;
+      vertical-align: baseline;
+      top: -0.4em;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Laboratoire de validation typographique — Version 5</h1>
+    <p>Démonstration interactive enrichie (Petites capitales, Exposants et Micro-mise en page sémantique)</p>
+  </header>
+
+  <main>
+    <!-- Règle 1 -->
+    <article>
+      <h2>1. L'apostrophe courbe</h2>
+      <p>L'apostrophe droite (') doit être remplacée par une apostrophe courbe (’) exclusivement lorsqu'elle se trouve au cœur d'un mot (élision).</p>
+      <section>
+        <p class="no-typo">C'est l'été, d'accord ?</p>
+        <p>C'est l'été, d'accord ?</p>
+      </section>
+    </article>
+
+    <!-- Règle 2 -->
+    <article>
+      <h2>2. Les grands nombres (Texte)</h2>
+      <p>Les nombres de 5 chiffres et plus reçoivent une espace fine insécable. Les nombres à 4 chiffres (comme les années) restent soudés.</p>
+      <section>
+        <p class="no-typo">En 2026, la population augmentera de 15000 habitants.</p>
+        <p>En 2026, la population augmentera de 15000 habitants.</p>
+      </section>
+    </article>
+
+    <!-- Règle 3 -->
+    <article>
+      <h2>3. Les grands nombres (Tableau)</h2>
+      <p>Dans les cellules de tableau (TD), la séparation par blocs de 3 chiffres s'applique dès 4 chiffres pour préserver l'alignement visuel.</p>
+      <section>
+        <table class="no-typo"><tr><td>1500</td></tr></table>
+        <table><tr><td>1500</td></tr></table>
+      </section>
+    </article>
+
+    <!-- Règle 4 -->
+    <article>
+      <h2>4. Les devises et symboles</h2>
+      <p>Une espace fine insécable doit séparer un nombre du symbole monétaire ou de pourcentage qui le suit.</p>
+      <section>
+        <p class="no-typo">Le taux d'intérêt est à 5% pour un gain de 2500€.</p>
+        <p>Le taux d'intérêt est à 5% pour un gain de 2500€.</p>
+      </section>
+    </article>
+
+    <!-- Règle 5 -->
+    <article>
+      <h2>5. Les unités de mesure</h2>
+      <p>Les unités physiques (cm, kg, km/h, °C) requièrent une espace fine insécable après le nombre, sans corrompre les mots usuels.</p>
+      <section>
+        <p class="no-typo">Le colis de 12kg a roulé sur 50km à 130km/h par 35°C.</p>
+        <p>Le colis de 12kg a roulé sur 50km à 130km/h par 35°C.</p>
+      </section>
+    </article>
+
+    <!-- Règle 6 -->
+    <article>
+      <h2>6. Les civilités et abréviations</h2>
+      <p>Les abréviations comme M., Mme, Dr ou Cie doivent être solidarisées avec le mot suivant via une espace insécable standard.</p>
+      <section>
+        <p class="no-typo">Le Dr Dupont et Mme Martin travaillent pour la Cie Générale.</p>
+        <p>Le Dr Dupont et Mme Martin travaillent pour la Cie Générale.</p>
+      </section>
+    </article>
+
+    <!-- Règle 7 -->
+    <article>
+      <h2>7. Les tirets de dialogue</h2>
+      <p>Les tirets en début de ligne (- ou --) se transforment en tiret cadratin (—) suivi d'une espace insécable standard.</p>
+      <section>
+        <p class="no-typo">- Bonjour !<br>-- Comment allez-vous ?</p>
+        <p>- Bonjour !<br>-- Comment allez-vous ?</p>
+      </section>
+    </article>
+
+    <!-- Règle 8 -->
+    <article>
+      <h2>8. Les tirets d'incise</h2>
+      <p>Les incises de phrases s'encadrent de tirets demi-cadratins (–) bordés d'espaces insécables standards.</p>
+      <section>
+        <p class="no-typo">Cette règle - dit-il - est essentielle pour la mise en page.</p>
+        <p>Cette règle - dit-il - est essentielle pour la mise en page.</p>
+      </section>
+    </article>
+
+    <!-- Règle 9 -->
+    <article>
+      <h2>9. Les guillemets</h2>
+      <p>Les guillemets droits (") sont remplacés par des guillemets français (« ») intégrant des espaces fines insécables à l'intérieur.</p>
+      <section>
+        <p class="no-typo">Elle s'exclama : "C'est une réussite totale !".</p>
+        <p>Elle s'exclama : "C'est une réussite totale !".</p>
+      </section>
+    </article>
+
+    <!-- Règle 10 -->
+    <article>
+      <h2>10. La ponctuation double & deux-points</h2>
+      <p>Les signes !, ?, ; requièrent une espace fine insécable. Le deux-points (:) réclame une espace insécable standard.</p>
+      <section>
+        <p class="no-typo">Regarde ceci: un test! Prêt? C'est parti;</p>
+        <p>Regarde ceci: un test! Prêt? C'est parti;</p>
+      </section>
+    </article>
+
+    <!-- Règle 11 (Nouvelle v5) -->
+    <article>
+      <h2>11. Les sigles (Petites capitales)</h2>
+      <p>Toute suite de 2 majuscules consécutives ou plus est entourée de la balise ABBR pour basculer en petites capitales harmonieuses.</p>
+      <section>
+        <p class="no-typo">L'organisme de la SNCF collabore avec l'UNESCO et l'ONU.</p>
+        <p>L'organisme de la SNCF collabore avec l'UNESCO et l'ONU.</p>
+      </section>
+    </article>
+
+    <!-- Règle 12 (Nouvelle v5) -->
+    <article>
+      <h2>12. Les siècles en chiffres romains</h2>
+      <p>Les siècles en chiffres romains passent en petites capitales (ABBR) tandis que leur suffixe ordinal passe en exposant (SUP).</p>
+      <section>
+        <p class="no-typo">Nous vivons au XXIe siècle, juste après le XXe siècle et le Ier siècle.</p>
+        <p>Nous vivons au XXIe siècle, juste après le XXe siècle et le Ier siècle.</p>
+      </section>
+    </article>
+
+    <!-- Règle 13 (Nouvelle v5) -->
+    <article>
+      <h2>13. Les ordinaux en chiffres arabes</h2>
+      <p>Les terminaisons des abréviations ordinales en chiffres arabes (er, re, e, ers, res) sont automatiquement placées en exposant (SUP).</p>
+      <section>
+        <p class="no-typo">Habiter au 1er étage du 2e bâtiment de la 3e avenue.</p>
+        <p>Habiter au 1er étage du 2e bâtiment de la 3e avenue.</p>
+      </section>
+    </article>
+
+    <!-- Règle 14 (Nouvelle v5) -->
+    <article>
+      <h2>14. Contraction des civilités</h2>
+      <p>Les suffixes des abréviations de civilités contractées (me, lle, e, gr) passent en exposant (SUP). M. et Dr restent bas.</p>
+      <section>
+        <p class="no-typo">Mme Martin, Mlle Julie et Me Dupont saluent le Dr Evans.</p>
+        <p>Mme Martin, Mlle Julie et Me Dupont saluent le Dr Evans.</p>
+      </section>
+    </article>
+  </main>
+
+  <footer>
+    <p>Banc d'essai v5 généré automatiquement — Conforme aux directives de l'Imprimerie Nationale.</p>
+  </footer>
+
+  <!-- Lien vers le script de traitement externe -->
+  <script src="typo-fr.js"></script>
+</body>
+</html>
